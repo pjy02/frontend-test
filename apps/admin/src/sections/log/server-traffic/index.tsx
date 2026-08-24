@@ -3,11 +3,11 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterServerTrafficLog } from "@workspace/ui/services/admin/log";
 import { formatBytes } from "@workspace/ui/utils/formatting";
 import { useTranslation } from "react-i18next";
 import { useServer } from "@/stores/server";
+import { LogTable } from "../log-table";
 
 export default function ServerTrafficLogPage() {
   const { t } = useTranslation("log");
@@ -21,7 +21,7 @@ export default function ServerTrafficLogPage() {
     server_id: sp.server_id ? Number(sp.server_id) : undefined,
   };
   return (
-    <ProTable<API.ServerTrafficLog, { date?: string; server_id?: number }>
+    <LogTable<API.ServerTrafficLog, { date?: string; server_id?: number }>
       actions={{
         render: (row) => [
           <Button asChild key="detail">
@@ -62,7 +62,6 @@ export default function ServerTrafficLogPage() {
         },
         { accessorKey: "date", header: t("column.date", "Date") },
       ]}
-      header={{ title: t("title.serverTraffic", "Server Traffic Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -79,6 +78,7 @@ export default function ServerTrafficLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.serverTraffic", "Server Traffic Log")}
     />
   );
 }

@@ -822,7 +822,7 @@ export default function UiLab() {
                 <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                   <Palette className="size-5" />
                 </div>
-                <Badge variant="secondary">Design System · Phase 1–6</Badge>
+                <Badge variant="secondary">Design System · Phase 1–7</Badge>
               </div>
               <h1 className="type-display">Perfect Panel UI Lab</h1>
               <p className="mt-4 max-w-2xl text-base text-muted-foreground leading-relaxed">
@@ -906,9 +906,9 @@ export default function UiLab() {
         </div>
 
         <footer className="mt-12 flex flex-col gap-2 border-t py-8 text-muted-foreground text-xs sm:flex-row sm:items-center sm:justify-between">
-          <span>Perfect Panel Design System · Phase 1–6</span>
+          <span>Perfect Panel Design System · Phase 1–7</span>
           <span>
-            Foundation · Shell · Page Patterns · Business & Complex Workspaces
+            Foundation · Shell · Page Patterns · Workspaces · Observability
           </span>
         </footer>
       </div>

@@ -36,6 +36,7 @@ import {
   PieChart,
   XAxis,
 } from "recharts";
+import { DASHBOARD_REFRESH_INTERVAL } from "./dashboard-refresh";
 
 export function UserStatisticsCard() {
   const { t, i18n } = useTranslation("dashboard");
@@ -62,6 +63,7 @@ export function UserStatisticsCard() {
       const { data } = await queryUserStatistics();
       return data.data;
     },
+    refetchInterval: DASHBOARD_REFRESH_INTERVAL,
   });
 
   return (

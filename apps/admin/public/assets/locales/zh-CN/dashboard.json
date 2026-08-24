@@ -1,4 +1,5 @@
 {
+  "autoSync": "30 秒自动同步",
   "billing": {
     "description": "赞助帮助 PPanel 继续发布更新！",
     "title": "赞助"
@@ -14,6 +15,7 @@
   "offline": "离线",
   "online": "在线",
   "onlineUsersCount": "在线用户数",
+  "openObservability": "打开可观测性",
   "pageDescription": "从统一的运营视图监控服务健康、收入、用户与流量。",
   "pageEyebrow": "运营概览",
   "pageTitle": "仪表盘",
@@ -21,6 +23,7 @@
   "pendingTickets": "待处理工单",
   "register": "注册",
   "repurchase": "续费",
+  "refreshDashboard": "刷新数据",
   "revenueTitle": "收入统计",
   "selectTypePlaceholder": "选择类型",
   "today": "今日",
@@ -29,6 +32,7 @@
   "totalIncome": "总收入",
   "totalServers": "服务器总数",
   "systemSettings": "系统设置",
+  "syncing": "同步中",
   "traffic": "流量",
   "trafficRank": "流量排行",
   "trafficRankDescription": "上传与下载合计最高的对象",

@@ -38,6 +38,7 @@ import {
   XAxis,
 } from "recharts";
 import { Display } from "@/components/display";
+import { DASHBOARD_REFRESH_INTERVAL } from "./dashboard-refresh";
 
 export function RevenueStatisticsCard() {
   const { t, i18n } = useTranslation("dashboard");
@@ -64,6 +65,7 @@ export function RevenueStatisticsCard() {
       const { data } = await queryRevenueStatistics();
       return data.data;
     },
+    refetchInterval: DASHBOARD_REFRESH_INTERVAL,
   });
 
   return (

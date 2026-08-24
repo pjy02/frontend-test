@@ -2,13 +2,13 @@
 
 import { useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterGiftLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { Display } from "@/components/display";
 import { OrderLink } from "@/components/order-link";
 import { UserDetail, UserSubscribeDetail } from "@/sections/user/user-detail";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function GiftLogPage() {
   const { t } = useTranslation("log");
@@ -29,7 +29,7 @@ export default function GiftLogPage() {
     user_id: sp.user_id ? Number(sp.user_id) : undefined,
   };
   return (
-    <ProTable<API.GiftLog, { search?: string }>
+    <LogTable<API.GiftLog, { search?: string }>
       columns={[
         {
           accessorKey: "user",
@@ -80,7 +80,6 @@ export default function GiftLogPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.gift", "Gift Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -97,6 +96,7 @@ export default function GiftLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.gift", "Gift Log")}
     />
   );
 }

@@ -2,13 +2,13 @@
 
 import { useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterCommissionLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { Display } from "@/components/display";
 import { OrderLink } from "@/components/order-link";
 import { UserDetail } from "@/sections/user/user-detail";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function CommissionLogPage() {
   const { t } = useTranslation("log");
@@ -29,7 +29,7 @@ export default function CommissionLogPage() {
     user_id: sp.user_id ? Number(sp.user_id) : undefined,
   };
   return (
-    <ProTable<API.CommissionLog, { search?: string }>
+    <LogTable<API.CommissionLog, { search?: string }>
       columns={[
         {
           accessorKey: "user",
@@ -61,7 +61,6 @@ export default function CommissionLogPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.commission", "Commission Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -78,6 +77,7 @@ export default function CommissionLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.commission", "Commission Log")}
     />
   );
 }

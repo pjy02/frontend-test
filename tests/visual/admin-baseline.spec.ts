@@ -257,6 +257,115 @@ const visualNode = {
   updated_at: 1_724_605_200_000,
 };
 
+const visualLogRecords: Record<string, Record<string, unknown>> = {
+  "/v1/admin/log/balance/list": {
+    id: 701,
+    user_id: 1001,
+    amount: 19_900,
+    balance: 128_600,
+    order_no: "PP-20260824-0001",
+    type: 321,
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/commission/list": {
+    id: 702,
+    user_id: 1001,
+    amount: 2480,
+    order_no: "PP-20260824-0001",
+    type: 325,
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/email/list": {
+    id: 703,
+    platform: "smtp",
+    to: "member@example.com",
+    subject: "Subscription renewed",
+    content: { template: "renewal-success", locale: "zh-CN" },
+    status: 1,
+    created_at: 1_724_605_200,
+  },
+  "/v1/admin/log/gift/list": {
+    id: 704,
+    user_id: 1001,
+    subscribe_id: 101,
+    order_no: "PP-20260824-0001",
+    amount: 5000,
+    balance: 133_600,
+    type: 341,
+    remark: "Retention campaign credit",
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/login/list": {
+    id: 705,
+    user_id: 1001,
+    method: "email",
+    login_ip: "203.0.113.24",
+    user_agent: "Mozilla/5.0 PPanel Operations Console",
+    success: true,
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/mobile/list": {
+    id: 706,
+    platform: "twilio",
+    to: "+86 138 0000 0000",
+    subject: "Verification code",
+    content: { template: "login-code", region: "CN" },
+    status: 1,
+    created_at: 1_724_605_200,
+  },
+  "/v1/admin/log/register/list": {
+    id: 707,
+    user_id: 1001,
+    auth_method: "email",
+    identifier: "member@example.com",
+    register_ip: "203.0.113.24",
+    user_agent: "Mozilla/5.0 PPanel Operations Console",
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/subscribe/reset/list": {
+    id: 708,
+    user_id: 1001,
+    user_subscribe_id: 101,
+    type: 231,
+    order_no: "PP-20260824-0001",
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/server/traffic/list": {
+    id: 709,
+    server_id: 1,
+    upload: 8_000_000_000,
+    download: 24_000_000_000,
+    total: 32_000_000_000,
+    date: "2026-08-24",
+  },
+  "/v1/admin/log/subscribe/list": {
+    id: 710,
+    user_id: 1001,
+    user_subscribe_id: 101,
+    client_ip: "203.0.113.24",
+    user_agent: "Clash Meta/1.19.0",
+    timestamp: 1_724_605_200,
+  },
+  "/v1/admin/log/subscribe/traffic/list": {
+    id: 711,
+    user_id: 1001,
+    subscribe_id: 101,
+    upload: 3_000_000_000,
+    download: 9_000_000_000,
+    total: 12_000_000_000,
+    date: "2026-08-24",
+  },
+  "/v1/admin/log/traffic/details": {
+    id: 712,
+    server_id: 1,
+    user_id: 1001,
+    subscribe_id: 101,
+    upload: 3_000_000_000,
+    download: 9_000_000_000,
+    timestamp: 1_724_605_200,
+  },
+};
+
 const visualApplication = {
   id: 31,
   name: "Clash Meta",
@@ -451,6 +560,10 @@ function responseFor(url: URL) {
       avatar: "",
       auth_methods: [{ auth_identifier: "admin@example.com" }],
     };
+  }
+  const visualLogRecord = visualLogRecords[url.pathname];
+  if (visualLogRecord) {
+    return { count: 1, list: [visualLogRecord], total: 1 };
   }
   if (url.pathname.endsWith("/v1/admin/user/list")) {
     return { count: 1, list: [visualUser], total: 1 };
@@ -920,6 +1033,31 @@ test.describe("admin phase 0 visual baseline", () => {
     ).toBeVisible();
     await stabilizeVisuals(page);
     await expect(page).toHaveScreenshot("plugin-runtime-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("observability workspace refresh control and record detail", async ({
+    page,
+  }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/log/login");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "登录日志" })
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "每 30 秒" }).click();
+    await page.getByRole("menuitemradio", { name: "每 15 秒" }).click();
+    await expect(page.getByRole("button", { name: "每 15 秒" })).toBeVisible();
+
+    await page.getByRole("button", { name: "查看详情" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "记录详情 #705" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("log-record-detail-sheet.png", {
       animations: "disabled",
       fullPage: false,
     });

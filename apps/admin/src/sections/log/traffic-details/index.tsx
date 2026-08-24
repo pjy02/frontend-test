@@ -1,13 +1,13 @@
 "use client";
 
 import { useSearch } from "@tanstack/react-router";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterTrafficLogDetails } from "@workspace/ui/services/admin/log";
 import { formatBytes } from "@workspace/ui/utils/formatting";
 import { useTranslation } from "react-i18next";
 import { UserDetail, UserSubscribeDetail } from "@/sections/user/user-detail";
 import { useServer } from "@/stores/server";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function TrafficDetailsPage() {
   const { t } = useTranslation("log");
@@ -23,7 +23,7 @@ export default function TrafficDetailsPage() {
     subscribe_id: sp.subscribe_id ? Number(sp.subscribe_id) : undefined,
   };
   return (
-    <ProTable<API.TrafficLogDetails, { search?: string }>
+    <LogTable<API.TrafficLogDetails, { search?: string }>
       columns={[
         {
           accessorKey: "server_id",
@@ -66,7 +66,6 @@ export default function TrafficDetailsPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.trafficDetails", "Traffic Details") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -90,6 +89,7 @@ export default function TrafficDetailsPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.trafficDetails", "Traffic Details")}
     />
   );
 }

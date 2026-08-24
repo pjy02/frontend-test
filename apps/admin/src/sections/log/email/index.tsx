@@ -2,10 +2,10 @@
 
 import { useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterEmailLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function EmailLogPage() {
   const { t } = useTranslation("log");
@@ -18,7 +18,7 @@ export default function EmailLogPage() {
     date: sp.date || today,
   };
   return (
-    <ProTable<API.MessageLog, { search?: string }>
+    <LogTable<API.MessageLog, { search?: string }>
       columns={[
         {
           accessorKey: "platform",
@@ -70,7 +70,6 @@ export default function EmailLogPage() {
           cell: ({ row }) => formatDate(row.original.created_at),
         },
       ]}
-      header={{ title: t("title.email", "Email Log") }}
       initialFilters={initialFilters}
       params={[{ key: "search" }, { key: "date", type: "date" }]}
       request={async (pagination, filter) => {
@@ -84,6 +83,7 @@ export default function EmailLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.email", "Email Log")}
     />
   );
 }

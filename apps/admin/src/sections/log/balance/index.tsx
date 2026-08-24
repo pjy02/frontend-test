@@ -2,13 +2,13 @@
 
 import { useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterBalanceLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { Display } from "@/components/display";
 import { OrderLink } from "@/components/order-link";
 import { UserDetail } from "@/sections/user/user-detail";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function BalanceLogPage() {
   const { t } = useTranslation("log");
@@ -47,7 +47,7 @@ export default function BalanceLogPage() {
     user_id: sp.user_id ? Number(sp.user_id) : undefined,
   };
   return (
-    <ProTable<API.BalanceLog, { search?: string }>
+    <LogTable<API.BalanceLog, { search?: string }>
       columns={[
         {
           accessorKey: "user",
@@ -86,7 +86,6 @@ export default function BalanceLogPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.balance", "Balance Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -103,6 +102,7 @@ export default function BalanceLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.balance", "Balance Log")}
     />
   );
 }

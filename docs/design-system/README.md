@@ -20,6 +20,9 @@ Phase 6 infrastructure, subscription delivery, product composition, identity,
 and plugin lifecycle workspaces are defined in
 [`complex-workspaces.md`](./complex-workspaces.md).
 
+Phase 7 log exploration, refresh behavior, event detail, and dashboard data
+integration are defined in [`observability.md`](./observability.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations

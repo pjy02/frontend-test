@@ -2,12 +2,12 @@
 
 import { useSearch } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterResetSubscribeLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { OrderLink } from "@/components/order-link";
 import { UserDetail, UserSubscribeDetail } from "@/sections/user/user-detail";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function ResetSubscribeLogPage() {
   const { t } = useTranslation("log");
@@ -30,7 +30,7 @@ export default function ResetSubscribeLogPage() {
       : undefined,
   };
   return (
-    <ProTable<
+    <LogTable<
       API.ResetSubscribeLog,
       { date?: string; user_subscribe_id?: number }
     >
@@ -69,7 +69,6 @@ export default function ResetSubscribeLogPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.resetSubscribe", "Reset Subscribe Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -89,6 +88,7 @@ export default function ResetSubscribeLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.resetSubscribe", "Reset Subscribe Log")}
     />
   );
 }

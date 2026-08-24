@@ -2,9 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { PageHeader } from "@workspace/ui/composed/page-header";
 import { StatusBadge } from "@workspace/ui/composed/status-badge";
-import { Settings, Users } from "lucide-react";
+import { Activity, Settings, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Billing from "./components/billing";
+import { DashboardRefresh } from "./components/dashboard-refresh";
 import Statistics from "./components/statistics";
 
 export default function Dashboard() {
@@ -15,6 +16,13 @@ export default function Dashboard() {
       <PageHeader
         actions={
           <>
+            <DashboardRefresh />
+            <Button asChild variant="outline">
+              <Link to="/dashboard/log/login">
+                <Activity />
+                {t("openObservability", "Open observability")}
+              </Link>
+            </Button>
             <Button asChild variant="outline">
               <Link to="/dashboard/user">
                 <Users />
@@ -35,9 +43,14 @@ export default function Dashboard() {
         )}
         eyebrow={t("pageEyebrow", "Operations overview")}
         metadata={
-          <StatusBadge pulse tone="success">
-            {t("liveData", "Live data")}
-          </StatusBadge>
+          <>
+            <StatusBadge pulse tone="success">
+              {t("liveData", "Live data")}
+            </StatusBadge>
+            <StatusBadge tone="info">
+              {t("autoSync", "30s auto sync")}
+            </StatusBadge>
+          </>
         }
         title={t("pageTitle", "Dashboard")}
       />

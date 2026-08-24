@@ -1,4 +1,17 @@
 {
+  "autoRefresh": "自动刷新",
+  "lastUpdated": "更新于 {{time}}",
+  "liveMonitoring": "实时监控中",
+  "pageDescription": "在统一工作区中筛选、检查并持续监控运营事件。",
+  "pageEyebrow": "可观测性",
+  "paused": "已暂停",
+  "recordDetail": "记录详情",
+  "recordDetailDescription": "当前日志事件返回的完整字段值。",
+  "refreshEvery": "每 {{seconds}} 秒",
+  "refreshNow": "立即刷新",
+  "refreshOff": "关闭自动刷新",
+  "viewDetail": "查看详情",
+  "waitingForData": "等待数据",
   "column": {
     "amount": "金额",
     "balance": "余额",

@@ -45,6 +45,7 @@ import {
   YAxis,
 } from "recharts";
 import { UserDetail, UserSubscribeDetail } from "@/sections/user/user-detail";
+import { DASHBOARD_REFRESH_INTERVAL } from "./dashboard-refresh";
 import { RevenueStatisticsCard } from "./revenue-statistics-card";
 import SystemVersionCard from "./system-version-card";
 import { UserStatisticsCard } from "./user-statistics-card";
@@ -58,6 +59,7 @@ export default function Statistics() {
       const { data } = await queryTicketWaitReply();
       return data.data?.count;
     },
+    refetchInterval: DASHBOARD_REFRESH_INTERVAL,
   });
   const { data: ServerTotal } = useQuery({
     queryKey: ["queryServerTotalData"],
@@ -65,6 +67,7 @@ export default function Statistics() {
       const { data } = await queryServerTotalData();
       return data.data;
     },
+    refetchInterval: DASHBOARD_REFRESH_INTERVAL,
   });
 
   const [timeFrame, setTimeFrame] = useState<string | "today" | "yesterday">(

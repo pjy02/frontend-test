@@ -8,12 +8,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { ProTable } from "@workspace/ui/composed/pro-table/pro-table";
 import { filterLoginLog } from "@workspace/ui/services/admin/log";
 import { useTranslation } from "react-i18next";
 import { IpLink } from "@/components/ip-link";
 import { UserDetail } from "@/sections/user/user-detail";
 import { formatDate } from "@/utils/common";
+import { LogTable } from "../log-table";
 
 export default function LoginLogPage() {
   const { t } = useTranslation("log");
@@ -26,7 +26,7 @@ export default function LoginLogPage() {
     user_id: sp.user_id ? Number(sp.user_id) : undefined,
   };
   return (
-    <ProTable<API.LoginLog, { date?: string; user_id?: number }>
+    <LogTable<API.LoginLog, { date?: string; user_id?: number }>
       columns={[
         {
           accessorKey: "user",
@@ -84,7 +84,6 @@ export default function LoginLogPage() {
           cell: ({ row }) => formatDate(row.original.timestamp),
         },
       ]}
-      header={{ title: t("title.login", "Login Log") }}
       initialFilters={initialFilters}
       params={[
         { key: "date", type: "date" },
@@ -101,6 +100,7 @@ export default function LoginLogPage() {
         const total = Number(data?.data?.total || list.length);
         return { list, total };
       }}
+      title={t("title.login", "Login Log")}
     />
   );
 }
