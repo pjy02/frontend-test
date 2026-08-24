@@ -104,8 +104,11 @@ export default function EmailAuthForm() {
 
   return (
     <>
-      <div className="mb-11 text-center">
-        <h1 className="mb-3 font-bold text-2xl">
+      <div className="mb-8">
+        <p className="type-label mb-3 text-primary uppercase">
+          Secure admin access
+        </p>
+        <h1 className="type-title">
           {type === "login"
             ? t("login.title", "Login")
             : type === "register"
@@ -114,7 +117,7 @@ export default function EmailAuthForm() {
                 ? t("reset.title", "Reset Password")
                 : t("check.title", "Verify")}
         </h1>
-        <div className="font-medium text-muted-foreground">
+        <p className="mt-2 text-muted-foreground leading-relaxed">
           {type === "login"
             ? t("login.description", "Enter your credentials to continue")
             : type === "register"
@@ -122,7 +125,7 @@ export default function EmailAuthForm() {
               : type === "reset"
                 ? t("reset.description", "Reset your password")
                 : t("check.description", "Verify your identity")}
-        </div>
+        </p>
       </div>
       {UserForm}
     </>

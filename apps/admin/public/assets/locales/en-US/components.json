@@ -1,4 +1,15 @@
 {
+  "command": {
+    "description": "Search all admin pages and tools",
+    "empty": "No matching pages found.",
+    "hint": "Use arrow keys to navigate",
+    "open": "Search and open command menu",
+    "openAction": "Open",
+    "placeholder": "Type a page or action...",
+    "search": "Search navigation...",
+    "title": "Command menu",
+    "tools": "Tools"
+  },
   "empty": {
     "tips": {
       "0": "Imagine this space filled with exciting content! For now, you'll have to use your imagination...",

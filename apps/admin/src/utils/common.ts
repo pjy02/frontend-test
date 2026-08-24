@@ -51,34 +51,47 @@ export function setAuthorization(token: string): void {
   setCookie("Authorization", token);
 }
 
+export function sanitizeRedirectPath(
+  value?: string | null
+): string | undefined {
+  if (!value?.startsWith("/") || value.startsWith("//")) return;
+  try {
+    const url = new URL(value, "https://admin.local");
+    if (url.origin !== "https://admin.local") return;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return;
+  }
+}
+
 export function getRedirectUrl(): string {
   if (typeof window === "undefined") return "/dashboard";
-  const params = new URLSearchParams(window.location.search);
-  const redirect = params.get("redirect");
-  return redirect?.startsWith("/") ? redirect : "/dashboard";
+
+  const storedRedirect = sanitizeRedirectPath(
+    sessionStorage.getItem("redirect-url")
+  );
+  sessionStorage.removeItem("redirect-url");
+  if (storedRedirect) return storedRedirect;
+
+  const hashSearch = window.location.hash.split("?")[1];
+  const params = new URLSearchParams(
+    hashSearch || window.location.search.replace(/^\?/, "")
+  );
+  return sanitizeRedirectPath(params.get("redirect")) || "/dashboard";
 }
 
 export function setRedirectUrl(value?: string) {
-  if (value) {
-    sessionStorage.setItem("redirect-url", value);
-  }
+  const redirect = sanitizeRedirectPath(value);
+  if (redirect && redirect !== "/")
+    sessionStorage.setItem("redirect-url", redirect);
 }
 
 export function Logout() {
   if (!isBrowser()) return;
   removeCookie("Authorization");
 
-  const pathname = location.pathname;
-  const hash = location.hash.slice(1);
-
-  if (!["", "/"].includes(pathname)) {
-    setRedirectUrl(pathname);
-    location.href = "/";
-    return;
-  }
-
-  if (hash && !["", "/"].includes(hash)) {
-    setRedirectUrl(hash);
-    location.href = "/";
-  }
+  const hashPath = location.hash.slice(1);
+  const currentPath = hashPath || location.pathname;
+  setRedirectUrl(currentPath);
+  location.href = "/#/";
 }

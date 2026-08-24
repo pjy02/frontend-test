@@ -11,10 +11,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as IndexRouteImport } from './routes/index'
 
 const UiLabLazyRouteImport = createFileRoute('/ui-lab')()
-const DashboardRouteLazyRouteImport = createFileRoute('/dashboard')()
-const IndexLazyRouteImport = createFileRoute('/')()
 const DashboardIndexLazyRouteImport = createFileRoute('/dashboard/')()
 const DashboardServersLazyRouteImport = createFileRoute('/dashboard/servers')()
 const DashboardPluginLazyRouteImport = createFileRoute('/dashboard/plugin')()
@@ -90,14 +90,14 @@ const UiLabLazyRoute = UiLabLazyRouteImport.update({
   path: '/ui-lab',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/ui-lab.lazy').then((d) => d.Route))
-const DashboardRouteLazyRoute = DashboardRouteLazyRouteImport.update({
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/dashboard/route.lazy').then((d) => d.Route),
 )
-const IndexLazyRoute = IndexLazyRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
@@ -105,35 +105,35 @@ const IndexLazyRoute = IndexLazyRouteImport.update({
 const DashboardIndexLazyRoute = DashboardIndexLazyRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/index.lazy').then((d) => d.Route),
 )
 const DashboardServersLazyRoute = DashboardServersLazyRouteImport.update({
   id: '/servers',
   path: '/servers',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/servers.lazy').then((d) => d.Route),
 )
 const DashboardPluginLazyRoute = DashboardPluginLazyRouteImport.update({
   id: '/plugin',
   path: '/plugin',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/plugin.lazy').then((d) => d.Route),
 )
 const DashboardNodesLazyRoute = DashboardNodesLazyRouteImport.update({
   id: '/nodes',
   path: '/nodes',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/nodes.lazy').then((d) => d.Route),
 )
 const DashboardUserIndexLazyRoute = DashboardUserIndexLazyRouteImport.update({
   id: '/user/',
   path: '/user/',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/user/index.lazy').then((d) => d.Route),
 )
@@ -141,7 +141,7 @@ const DashboardTicketIndexLazyRoute =
   DashboardTicketIndexLazyRouteImport.update({
     id: '/ticket/',
     path: '/ticket/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/ticket/index.lazy').then((d) => d.Route),
   )
@@ -149,7 +149,7 @@ const DashboardSystemIndexLazyRoute =
   DashboardSystemIndexLazyRouteImport.update({
     id: '/system/',
     path: '/system/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/system/index.lazy').then((d) => d.Route),
   )
@@ -157,7 +157,7 @@ const DashboardSubscribeIndexLazyRoute =
   DashboardSubscribeIndexLazyRouteImport.update({
     id: '/subscribe/',
     path: '/subscribe/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/subscribe/index.lazy').then((d) => d.Route),
   )
@@ -165,7 +165,7 @@ const DashboardProductIndexLazyRoute =
   DashboardProductIndexLazyRouteImport.update({
     id: '/product/',
     path: '/product/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/product/index.lazy').then((d) => d.Route),
   )
@@ -173,14 +173,14 @@ const DashboardPaymentIndexLazyRoute =
   DashboardPaymentIndexLazyRouteImport.update({
     id: '/payment/',
     path: '/payment/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/payment/index.lazy').then((d) => d.Route),
   )
 const DashboardOrderIndexLazyRoute = DashboardOrderIndexLazyRouteImport.update({
   id: '/order/',
   path: '/order/',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/order/index.lazy').then((d) => d.Route),
 )
@@ -188,7 +188,7 @@ const DashboardMarketingIndexLazyRoute =
   DashboardMarketingIndexLazyRouteImport.update({
     id: '/marketing/',
     path: '/marketing/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/marketing/index.lazy').then((d) => d.Route),
   )
@@ -196,7 +196,7 @@ const DashboardDocumentIndexLazyRoute =
   DashboardDocumentIndexLazyRouteImport.update({
     id: '/document/',
     path: '/document/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/document/index.lazy').then((d) => d.Route),
   )
@@ -204,7 +204,7 @@ const DashboardCouponIndexLazyRoute =
   DashboardCouponIndexLazyRouteImport.update({
     id: '/coupon/',
     path: '/coupon/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/coupon/index.lazy').then((d) => d.Route),
   )
@@ -212,7 +212,7 @@ const DashboardAuthControlIndexLazyRoute =
   DashboardAuthControlIndexLazyRouteImport.update({
     id: '/auth-control/',
     path: '/auth-control/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/auth-control/index.lazy').then((d) => d.Route),
   )
@@ -220,14 +220,14 @@ const DashboardAnnouncementIndexLazyRoute =
   DashboardAnnouncementIndexLazyRouteImport.update({
     id: '/announcement/',
     path: '/announcement/',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/announcement/index.lazy').then((d) => d.Route),
   )
 const DashboardAdsIndexLazyRoute = DashboardAdsIndexLazyRouteImport.update({
   id: '/ads/',
   path: '/ads/',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/ads/index.lazy').then((d) => d.Route),
 )
@@ -235,7 +235,7 @@ const DashboardLogTrafficDetailsLazyRoute =
   DashboardLogTrafficDetailsLazyRouteImport.update({
     id: '/log/traffic-details',
     path: '/log/traffic-details',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/traffic-details.lazy').then((d) => d.Route),
   )
@@ -243,7 +243,7 @@ const DashboardLogSubscribeTrafficLazyRoute =
   DashboardLogSubscribeTrafficLazyRouteImport.update({
     id: '/log/subscribe-traffic',
     path: '/log/subscribe-traffic',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/subscribe-traffic.lazy').then(
       (d) => d.Route,
@@ -253,7 +253,7 @@ const DashboardLogSubscribeLazyRoute =
   DashboardLogSubscribeLazyRouteImport.update({
     id: '/log/subscribe',
     path: '/log/subscribe',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/subscribe.lazy').then((d) => d.Route),
   )
@@ -261,7 +261,7 @@ const DashboardLogServerTrafficLazyRoute =
   DashboardLogServerTrafficLazyRouteImport.update({
     id: '/log/server-traffic',
     path: '/log/server-traffic',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/server-traffic.lazy').then((d) => d.Route),
   )
@@ -269,7 +269,7 @@ const DashboardLogResetSubscribeLazyRoute =
   DashboardLogResetSubscribeLazyRouteImport.update({
     id: '/log/reset-subscribe',
     path: '/log/reset-subscribe',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/reset-subscribe.lazy').then((d) => d.Route),
   )
@@ -277,35 +277,35 @@ const DashboardLogRegisterLazyRoute =
   DashboardLogRegisterLazyRouteImport.update({
     id: '/log/register',
     path: '/log/register',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/register.lazy').then((d) => d.Route),
   )
 const DashboardLogMobileLazyRoute = DashboardLogMobileLazyRouteImport.update({
   id: '/log/mobile',
   path: '/log/mobile',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/log/mobile.lazy').then((d) => d.Route),
 )
 const DashboardLogLoginLazyRoute = DashboardLogLoginLazyRouteImport.update({
   id: '/log/login',
   path: '/log/login',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/log/login.lazy').then((d) => d.Route),
 )
 const DashboardLogGiftLazyRoute = DashboardLogGiftLazyRouteImport.update({
   id: '/log/gift',
   path: '/log/gift',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/log/gift.lazy').then((d) => d.Route),
 )
 const DashboardLogEmailLazyRoute = DashboardLogEmailLazyRouteImport.update({
   id: '/log/email',
   path: '/log/email',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/log/email.lazy').then((d) => d.Route),
 )
@@ -313,21 +313,21 @@ const DashboardLogCommissionLazyRoute =
   DashboardLogCommissionLazyRouteImport.update({
     id: '/log/commission',
     path: '/log/commission',
-    getParentRoute: () => DashboardRouteLazyRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any).lazy(() =>
     import('./routes/dashboard/log/commission.lazy').then((d) => d.Route),
   )
 const DashboardLogBalanceLazyRoute = DashboardLogBalanceLazyRouteImport.update({
   id: '/log/balance',
   path: '/log/balance',
-  getParentRoute: () => DashboardRouteLazyRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any).lazy(() =>
   import('./routes/dashboard/log/balance.lazy').then((d) => d.Route),
 )
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/dashboard': typeof DashboardRouteLazyRouteWithChildren
+  '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
@@ -360,7 +360,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/user': typeof DashboardUserIndexLazyRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
   '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
@@ -394,8 +394,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexLazyRoute
-  '/dashboard': typeof DashboardRouteLazyRouteWithChildren
+  '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
@@ -532,8 +532,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  DashboardRouteLazyRoute: typeof DashboardRouteLazyRouteWithChildren
+  IndexRoute: typeof IndexRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   UiLabLazyRoute: typeof UiLabLazyRoute
 }
 
@@ -550,14 +550,14 @@ declare module '@tanstack/react-router' {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteLazyRouteImport
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyRouteImport
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -565,208 +565,208 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/servers': {
       id: '/dashboard/servers'
       path: '/servers'
       fullPath: '/dashboard/servers'
       preLoaderRoute: typeof DashboardServersLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/plugin': {
       id: '/dashboard/plugin'
       path: '/plugin'
       fullPath: '/dashboard/plugin'
       preLoaderRoute: typeof DashboardPluginLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/nodes': {
       id: '/dashboard/nodes'
       path: '/nodes'
       fullPath: '/dashboard/nodes'
       preLoaderRoute: typeof DashboardNodesLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/user/': {
       id: '/dashboard/user/'
       path: '/user'
       fullPath: '/dashboard/user'
       preLoaderRoute: typeof DashboardUserIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/ticket/': {
       id: '/dashboard/ticket/'
       path: '/ticket'
       fullPath: '/dashboard/ticket'
       preLoaderRoute: typeof DashboardTicketIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/system/': {
       id: '/dashboard/system/'
       path: '/system'
       fullPath: '/dashboard/system'
       preLoaderRoute: typeof DashboardSystemIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/subscribe/': {
       id: '/dashboard/subscribe/'
       path: '/subscribe'
       fullPath: '/dashboard/subscribe'
       preLoaderRoute: typeof DashboardSubscribeIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/product/': {
       id: '/dashboard/product/'
       path: '/product'
       fullPath: '/dashboard/product'
       preLoaderRoute: typeof DashboardProductIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/payment/': {
       id: '/dashboard/payment/'
       path: '/payment'
       fullPath: '/dashboard/payment'
       preLoaderRoute: typeof DashboardPaymentIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/order/': {
       id: '/dashboard/order/'
       path: '/order'
       fullPath: '/dashboard/order'
       preLoaderRoute: typeof DashboardOrderIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/marketing/': {
       id: '/dashboard/marketing/'
       path: '/marketing'
       fullPath: '/dashboard/marketing'
       preLoaderRoute: typeof DashboardMarketingIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/document/': {
       id: '/dashboard/document/'
       path: '/document'
       fullPath: '/dashboard/document'
       preLoaderRoute: typeof DashboardDocumentIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/coupon/': {
       id: '/dashboard/coupon/'
       path: '/coupon'
       fullPath: '/dashboard/coupon'
       preLoaderRoute: typeof DashboardCouponIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/auth-control/': {
       id: '/dashboard/auth-control/'
       path: '/auth-control'
       fullPath: '/dashboard/auth-control'
       preLoaderRoute: typeof DashboardAuthControlIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/announcement/': {
       id: '/dashboard/announcement/'
       path: '/announcement'
       fullPath: '/dashboard/announcement'
       preLoaderRoute: typeof DashboardAnnouncementIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/ads/': {
       id: '/dashboard/ads/'
       path: '/ads'
       fullPath: '/dashboard/ads'
       preLoaderRoute: typeof DashboardAdsIndexLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/traffic-details': {
       id: '/dashboard/log/traffic-details'
       path: '/log/traffic-details'
       fullPath: '/dashboard/log/traffic-details'
       preLoaderRoute: typeof DashboardLogTrafficDetailsLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/subscribe-traffic': {
       id: '/dashboard/log/subscribe-traffic'
       path: '/log/subscribe-traffic'
       fullPath: '/dashboard/log/subscribe-traffic'
       preLoaderRoute: typeof DashboardLogSubscribeTrafficLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/subscribe': {
       id: '/dashboard/log/subscribe'
       path: '/log/subscribe'
       fullPath: '/dashboard/log/subscribe'
       preLoaderRoute: typeof DashboardLogSubscribeLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/server-traffic': {
       id: '/dashboard/log/server-traffic'
       path: '/log/server-traffic'
       fullPath: '/dashboard/log/server-traffic'
       preLoaderRoute: typeof DashboardLogServerTrafficLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/reset-subscribe': {
       id: '/dashboard/log/reset-subscribe'
       path: '/log/reset-subscribe'
       fullPath: '/dashboard/log/reset-subscribe'
       preLoaderRoute: typeof DashboardLogResetSubscribeLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/register': {
       id: '/dashboard/log/register'
       path: '/log/register'
       fullPath: '/dashboard/log/register'
       preLoaderRoute: typeof DashboardLogRegisterLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/mobile': {
       id: '/dashboard/log/mobile'
       path: '/log/mobile'
       fullPath: '/dashboard/log/mobile'
       preLoaderRoute: typeof DashboardLogMobileLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/login': {
       id: '/dashboard/log/login'
       path: '/log/login'
       fullPath: '/dashboard/log/login'
       preLoaderRoute: typeof DashboardLogLoginLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/gift': {
       id: '/dashboard/log/gift'
       path: '/log/gift'
       fullPath: '/dashboard/log/gift'
       preLoaderRoute: typeof DashboardLogGiftLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/email': {
       id: '/dashboard/log/email'
       path: '/log/email'
       fullPath: '/dashboard/log/email'
       preLoaderRoute: typeof DashboardLogEmailLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/commission': {
       id: '/dashboard/log/commission'
       path: '/log/commission'
       fullPath: '/dashboard/log/commission'
       preLoaderRoute: typeof DashboardLogCommissionLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/log/balance': {
       id: '/dashboard/log/balance'
       path: '/log/balance'
       fullPath: '/dashboard/log/balance'
       preLoaderRoute: typeof DashboardLogBalanceLazyRouteImport
-      parentRoute: typeof DashboardRouteLazyRoute
+      parentRoute: typeof DashboardRouteRoute
     }
   }
 }
 
-interface DashboardRouteLazyRouteChildren {
+interface DashboardRouteRouteChildren {
   DashboardNodesLazyRoute: typeof DashboardNodesLazyRoute
   DashboardPluginLazyRoute: typeof DashboardPluginLazyRoute
   DashboardServersLazyRoute: typeof DashboardServersLazyRoute
@@ -798,7 +798,7 @@ interface DashboardRouteLazyRouteChildren {
   DashboardUserIndexLazyRoute: typeof DashboardUserIndexLazyRoute
 }
 
-const DashboardRouteLazyRouteChildren: DashboardRouteLazyRouteChildren = {
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardNodesLazyRoute: DashboardNodesLazyRoute,
   DashboardPluginLazyRoute: DashboardPluginLazyRoute,
   DashboardServersLazyRoute: DashboardServersLazyRoute,
@@ -830,12 +830,13 @@ const DashboardRouteLazyRouteChildren: DashboardRouteLazyRouteChildren = {
   DashboardUserIndexLazyRoute: DashboardUserIndexLazyRoute,
 }
 
-const DashboardRouteLazyRouteWithChildren =
-  DashboardRouteLazyRoute._addFileChildren(DashboardRouteLazyRouteChildren)
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  DashboardRouteLazyRoute: DashboardRouteLazyRouteWithChildren,
+  IndexRoute: IndexRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   UiLabLazyRoute: UiLabLazyRoute,
 }
 export const routeTree = rootRouteImport

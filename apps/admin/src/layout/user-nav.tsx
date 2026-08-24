@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
   Avatar,
   AvatarFallback,
@@ -10,9 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { FlaskConical, LogOut, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/stores/global";
 import { Logout } from "@/utils/common";
@@ -21,53 +22,59 @@ export function UserNav() {
   const { t } = useTranslation("auth");
   const { user } = useGlobalStore();
 
-  if (user) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="default">
-            <Avatar className="size-8">
-              <AvatarImage alt={user?.avatar ?? ""} src={user?.avatar ?? ""} />
-              <AvatarFallback className="rounded-none bg-transparent">
-                {user?.auth_methods?.[0]?.auth_identifier
-                  .toUpperCase()
-                  .charAt(0)}
+  if (!user) return null;
+
+  const identifier = user.auth_methods?.[0]?.auth_identifier || "Admin";
+  const fallback = identifier.toUpperCase().charAt(0);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          aria-label={identifier}
+          className="rounded-full p-0"
+          size="icon-sm"
+          variant="ghost"
+        >
+          <Avatar className="size-8 border bg-surface shadow-xs">
+            <AvatarImage alt={identifier} src={user.avatar ?? ""} />
+            <AvatarFallback className="bg-primary/10 font-semibold text-primary text-xs">
+              {fallback}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-64" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex items-center gap-3 py-1">
+            <Avatar className="size-9 border">
+              <AvatarImage alt={identifier} src={user.avatar ?? ""} />
+              <AvatarFallback className="bg-primary/10 font-semibold text-primary text-xs">
+                {fallback}
               </AvatarFallback>
             </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56" forceMount>
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="font-medium text-sm leading-none">
-                {user?.auth_methods?.[0]?.auth_identifier}
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium text-sm">{identifier}</p>
+              <p className="mt-0.5 flex items-center gap-1 text-muted-foreground text-xs">
+                <ShieldCheck className="size-3" />
+                Administrator
               </p>
-              {/* <p className='text-xs leading-none text-muted-foreground'>ID: {user?.id}</p> */}
             </div>
-          </DropdownMenuLabel>
-          {/* <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              Profile
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
-          </DropdownMenuGroup> */}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={Logout}>
-            {t("logout", "Logout")}
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/ui-lab">
+            <FlaskConical />
+            UI Lab
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={Logout} variant="destructive">
+          <LogOut />
+          {t("logout", "Logout")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

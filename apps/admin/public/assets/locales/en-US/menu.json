@@ -14,6 +14,7 @@
   "Logs & Analytics": "Logs & Analytics",
   "Maintenance": "Maintenance",
   "Marketing Management": "Marketing Management",
+  "Management": "Management",
   "Mobile": "Mobile",
   "Node Management": "Node Management",
   "Order Management": "Order Management",
@@ -32,5 +33,6 @@
   "Ticket Management": "Ticket Management",
   "Traffic Details": "Traffic Details",
   "User Management": "User Management",
-  "Users & Support": "Users & Support"
+  "Users & Support": "Users & Support",
+  "Workspace": "Workspace"
 }

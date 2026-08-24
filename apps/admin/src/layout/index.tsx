@@ -4,29 +4,26 @@ import {
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
 import { getCookie } from "@workspace/ui/lib/cookies";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Header } from "@/layout/header";
 import { SidebarLeft } from "./sidebar-left";
 
-export default function DashboardLayout() {
-  const [open, setOpen] = useState(true);
-
-  useEffect(() => {
-    const sidebarState = getCookie("sidebar_state");
-    if (sidebarState !== undefined) {
-      setOpen(sidebarState === "true");
-    }
-  }, []);
+export function AdminShell() {
+  const [defaultOpen] = useState(() => getCookie("sidebar_state") !== "false");
 
   return (
-    <SidebarProvider defaultOpen={open}>
+    <SidebarProvider defaultOpen={defaultOpen}>
       <SidebarLeft />
-      <SidebarInset className="relative flex-grow overflow-hidden">
+      <SidebarInset className="min-w-0 overflow-hidden border border-border/70">
         <Header />
-        <div className="h-[calc(100vh-56px)] flex-grow gap-4 overflow-auto p-4">
-          <Outlet />
+        <div className="min-h-0 flex-1 overflow-auto">
+          <div className="mx-auto w-full max-w-[112rem] p-[var(--page-gutter)]">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+export default AdminShell;

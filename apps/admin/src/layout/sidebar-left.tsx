@@ -1,29 +1,100 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@workspace/ui/components/hover-card";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@workspace/ui/components/collapsible";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
-import { Icon } from "@workspace/ui/composed/icon";
-import { cn } from "@workspace/ui/lib/utils";
-import React, { useState } from "react";
+import { ChevronRight, FlaskConical, PanelLeftClose } from "lucide-react";
+import type * as React from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGlobalStore } from "@/stores/global";
-import { type NavItem, useNavs } from "./navs";
+import {
+  isNavGroupActive,
+  isNavItemActive,
+  type NavItem,
+  useNavs,
+} from "./navs";
 
-function hasChildren(obj: any): obj is { items: any[] } {
+function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
+  const active = isNavGroupActive(pathname, item);
+  const { setOpen: setSidebarOpen, state } = useSidebar();
+  const [open, setOpen] = useState(item.defaultOpen || active);
+
+  useEffect(() => {
+    if (active) setOpen(true);
+  }, [active]);
+
+  const Icon = item.icon;
+
   return (
-    obj && Array.isArray((obj as any).items) && (obj as any).items.length > 0
+    <Collapsible
+      asChild
+      className="group/collapsible"
+      onOpenChange={setOpen}
+      open={open}
+    >
+      <SidebarGroup className="py-1">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton
+                aria-label={item.title}
+                className="h-[var(--control-height)]"
+                isActive={active}
+                onClick={() => {
+                  if (state === "collapsed") setSidebarOpen(true);
+                }}
+                tooltip={item.title}
+              >
+                <Icon />
+                <span>{item.title}</span>
+                <ChevronRight className="ml-auto transition-transform duration-[var(--motion-duration-fast)] group-data-[state=open]/collapsible:rotate-90" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                {item.items?.map((child) => {
+                  if (!child.url) return null;
+                  const ChildIcon = child.icon;
+                  return (
+                    <SidebarMenuSubItem key={child.url}>
+                      <SidebarMenuSubButton
+                        asChild
+                        className="h-[var(--control-height-sm)]"
+                        isActive={isNavItemActive(pathname, child.url)}
+                      >
+                        <Link to={child.url as "/dashboard"}>
+                          <ChildIcon />
+                          <span>{child.title}</span>
+                        </Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  );
+                })}
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+    </Collapsible>
   );
 }
 
@@ -31,140 +102,42 @@ export function SidebarLeft({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { common } = useGlobalStore();
-  const { site } = common;
+  const { t } = useTranslation("menu");
   const navs = useNavs();
   const pathname = useLocation({ select: (location) => location.pathname });
-  const { state, isMobile } = useSidebar();
-
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-
-  React.useEffect(() => {
-    setOpenGroups((prev) => {
-      const next: Record<string, boolean> = { ...prev };
-      navs.forEach((nav) => {
-        if (hasChildren(nav) && next[nav.title] === undefined) {
-          next[nav.title] = nav.defaultOpen ?? true;
-        }
-      });
-      return next;
-    });
-  }, [navs]);
-
-  const handleToggleGroup = (title: string) => {
-    setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }));
-  };
-
-  const normalize = (p: string) =>
-    p.endsWith("/") && p !== "/" ? p.replace(/\/+$/, "") : p;
-  const isActiveUrl = (url: string) => {
-    const path = normalize(pathname);
-    const target = normalize(url);
-    if (target === "/dashboard") return path === target;
-    if (path === target) return true;
-    return path.startsWith(`${target}/`);
-  };
-
-  const isGroupActive = (nav: NavItem) =>
-    (hasChildren(nav) && nav.items?.some((i: any) => isActiveUrl(i.url))) ||
-    ("url" in nav && nav.url ? isActiveUrl(nav.url as string) : false);
-
-  React.useEffect(() => {
-    setOpenGroups((prev) => {
-      const next: Record<string, boolean> = { ...prev };
-      navs.forEach((nav) => {
-        if (hasChildren(nav) && isGroupActive(nav)) next[nav.title] = true;
-      });
-      return next;
-    });
-  }, [pathname, navs]);
-
-  const renderCollapsedFlyout = (nav: NavItem) => {
-    const ParentButton = (
-      <SidebarMenuButton
-        aria-label={nav.title}
-        className="h-8 justify-center"
-        isActive={false}
-        size="sm"
-      >
-        {"url" in nav && nav.url ? (
-          <Link to={nav.url as string}>
-            {"icon" in nav && (nav as any).icon ? (
-              <Icon className="size-4" icon={(nav as any).icon} />
-            ) : null}
-          </Link>
-        ) : "icon" in nav && (nav as any).icon ? (
-          <Icon className="size-4" icon={(nav as any).icon} />
-        ) : null}
-      </SidebarMenuButton>
-    );
-
-    if (!hasChildren(nav)) return ParentButton;
-
-    return (
-      <HoverCard closeDelay={200} openDelay={40}>
-        <HoverCardTrigger asChild>{ParentButton}</HoverCardTrigger>
-        <HoverCardContent
-          align="start"
-          avoidCollisions
-          className="z-[9999] w-64 p-0"
-          collisionPadding={8}
-          side="right"
-          sideOffset={10}
-        >
-          <div className="flex items-center gap-2 border-b px-3 py-2">
-            {"icon" in nav && (nav as any).icon ? (
-              <Icon className="size-4" icon={(nav as any).icon} />
-            ) : null}
-            <span className="truncate font-medium text-muted-foreground text-xs">
-              {nav.title}
-            </span>
-          </div>
-
-          <ul className="p-1">
-            {nav.items?.map((item: any) => (
-              <li key={item.title}>
-                <Link
-                  className={[
-                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm",
-                    isActiveUrl(item.url)
-                      ? "bg-accent text-accent-foreground"
-                      : "hover:bg-accent/60",
-                  ].join(" ")}
-                  to={item.url}
-                >
-                  {item.icon && <Icon className="size-4" icon={item.icon} />}
-                  <span className="truncate">{item.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </HoverCardContent>
-      </HoverCard>
-    );
-  };
+  const { toggleSidebar } = useSidebar();
+  const dashboard = navs.find((item) => item.url === "/dashboard");
+  const groups = navs.filter((item) => item.items?.length);
+  const DashboardIcon = dashboard?.icon;
+  const siteName = common.site.site_name || "Perfect Panel";
+  const siteDescription = common.site.site_desc || "Admin Console";
 
   return (
-    <Sidebar className="border-r-0" collapsible="icon" {...props}>
-      <SidebarHeader className="p-2">
+    <Sidebar collapsible="icon" variant="inset" {...props}>
+      <SidebarHeader className="pt-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-10" size="sm">
-              <Link to="/">
-                <div className="flex aspect-square size-6 items-center justify-center rounded-lg">
+            <SidebarMenuButton
+              asChild
+              className="h-12 data-[active=true]:bg-transparent"
+              isActive
+              size="lg"
+              tooltip={siteName}
+            >
+              <Link to="/dashboard">
+                <div className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-lg border border-primary/15 bg-primary/10 shadow-xs">
                   <img
-                    alt="logo"
-                    className="size-full"
+                    alt=""
+                    className="size-6 object-contain"
                     height={24}
-                    src={site.site_logo || "/favicon.svg"}
+                    src={common.site.site_logo || "/favicon.svg"}
                     width={24}
                   />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold text-xs">
-                    {site.site_name}
-                  </span>
-                  <span className="truncate text-xs opacity-70">
-                    {site.site_desc}
+                <div className="grid min-w-0 flex-1 text-left leading-tight">
+                  <span className="truncate font-semibold">{siteName}</span>
+                  <span className="truncate text-muted-foreground text-xs">
+                    {siteDescription}
                   </span>
                 </div>
               </Link>
@@ -173,122 +146,60 @@ export function SidebarLeft({
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="py-2">
-        <SidebarMenu>
-          {!isMobile && state === "collapsed"
-            ? navs.map((nav) => (
-                <SidebarMenuItem className="mx-auto" key={nav.title}>
-                  {renderCollapsedFlyout(nav)}
+      <SidebarContent className="px-1 pb-2">
+        {dashboard?.url && DashboardIcon && (
+          <SidebarGroup className="pb-1">
+            <SidebarGroupLabel>{t("Workspace", "Workspace")}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="h-[var(--control-height)]"
+                    isActive={isNavItemActive(pathname, dashboard.url)}
+                    tooltip={dashboard.title}
+                  >
+                    <Link to="/dashboard">
+                      <DashboardIcon />
+                      <span>{dashboard.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))
-            : navs.map((nav) => {
-                if (hasChildren(nav)) {
-                  const isOpen = openGroups[nav.title] ?? false;
-                  return (
-                    <SidebarGroup className={cn("py-1")} key={nav.title}>
-                      <SidebarMenuButton
-                        className={cn(
-                          "mb-2 flex h-8 w-full items-center justify-between hover:bg-accent/60 hover:text-accent-foreground"
-                        )}
-                        isActive={false}
-                        onClick={() => handleToggleGroup(nav.title)}
-                        size="sm"
-                        style={{ fontWeight: 500 }}
-                        tabIndex={0}
-                      >
-                        <span className="flex min-w-0 items-center gap-2">
-                          {"icon" in nav && (nav as any).icon ? (
-                            <Icon
-                              className="size-4 shrink-0"
-                              icon={(nav as any).icon}
-                            />
-                          ) : null}
-                          <span className="truncate text-sm">{nav.title}</span>
-                        </span>
-                        <Icon
-                          className={`ml-2 size-4 transition-transform ${isOpen ? "" : "-rotate-90"}`}
-                          icon="mdi:chevron-down"
-                        />
-                      </SidebarMenuButton>
-                      {isOpen && (
-                        <SidebarGroupContent className="px-4">
-                          <SidebarMenu>
-                            {nav.items?.map((item: any) => (
-                              <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton
-                                  asChild
-                                  className="h-8"
-                                  isActive={isActiveUrl(item.url)}
-                                  size="sm"
-                                  tooltip={item.title}
-                                >
-                                  <Link to={item.url}>
-                                    {item.icon && (
-                                      <Icon
-                                        className="size-4"
-                                        icon={item.icon}
-                                      />
-                                    )}
-                                    <span className="text-sm">
-                                      {item.title}
-                                    </span>
-                                  </Link>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            ))}
-                          </SidebarMenu>
-                        </SidebarGroupContent>
-                      )}
-                    </SidebarGroup>
-                  );
-                }
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
-                return (
-                  <SidebarGroup className="py-1" key={nav.title}>
-                    <SidebarGroupContent>
-                      <SidebarMenu>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton
-                            asChild={"url" in nav && !!(nav as any).url}
-                            className="h-8"
-                            isActive={
-                              "url" in nav && (nav as any).url
-                                ? isActiveUrl((nav as any).url)
-                                : false
-                            }
-                            size="sm"
-                            tooltip={nav.title}
-                          >
-                            {"url" in nav && (nav as any).url ? (
-                              <Link to={(nav as any).url}>
-                                {"icon" in nav && (nav as any).icon ? (
-                                  <Icon
-                                    className="size-4"
-                                    icon={(nav as any).icon}
-                                  />
-                                ) : null}
-                                <span className="text-sm">{nav.title}</span>
-                              </Link>
-                            ) : (
-                              <>
-                                {"icon" in nav && (nav as any).icon ? (
-                                  <Icon
-                                    className="size-4"
-                                    icon={(nav as any).icon}
-                                  />
-                                ) : null}
-                                <span className="text-sm">{nav.title}</span>
-                              </>
-                            )}
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      </SidebarMenu>
-                    </SidebarGroupContent>
-                  </SidebarGroup>
-                );
-              })}
-        </SidebarMenu>
+        <SidebarGroupLabel className="px-4">
+          {t("Management", "Management")}
+        </SidebarGroupLabel>
+        {groups.map((item) => (
+          <NavGroup item={item} key={item.title} pathname={pathname} />
+        ))}
       </SidebarContent>
+
+      <SidebarFooter className="border-sidebar-border border-t">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="UI Lab">
+              <Link to="/ui-lab">
+                <FlaskConical />
+                <span>UI Lab</span>
+                <span className="ml-auto rounded bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary group-data-[collapsible=icon]:hidden">
+                  v2
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={toggleSidebar} tooltip="Toggle sidebar">
+              <PanelLeftClose />
+              <span>Collapse navigation</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

@@ -15,6 +15,12 @@ export function NavigationProgress() {
   }, [state.status]);
 
   return (
-    <LoadingBar color="var(--primary)" height={2} ref={ref} shadow={true} />
+    <LoadingBar
+      className="navigation-progress"
+      color="var(--primary)"
+      height={2}
+      ref={ref}
+      shadow={true}
+    />
   );
 }

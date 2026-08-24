@@ -4,6 +4,9 @@ This document defines the implementation contract for the admin redesign. The
 system is built on shadcn/ui composition patterns, but it is a product-specific
 design system rather than a copied dashboard skin.
 
+Phase 2 application-shell architecture, navigation, authentication, and error
+handling are defined in [`application-shell.md`](./application-shell.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations

@@ -182,6 +182,22 @@ async function preparePage(page: Page, authenticated: boolean) {
   await page.route("**/v1/**", mockApi);
 }
 
+async function stabilizeVisuals(page: Page) {
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        animation-duration: 0s !important;
+        transition-duration: 0s !important;
+        caret-color: transparent !important;
+      }
+
+      .navigation-progress {
+        display: none !important;
+      }
+    `,
+  });
+}
+
 test.describe("admin phase 0 visual baseline", () => {
   test.describe.configure({ mode: "serial" });
 
@@ -192,19 +208,77 @@ test.describe("admin phase 0 visual baseline", () => {
       await page.waitForLoadState("networkidle");
       await expect(page.locator("#app")).not.toBeEmpty();
       await expect(page.getByText("Something went wrong!")).toHaveCount(0);
-      await page.addStyleTag({
-        content: `
-          *, *::before, *::after {
-            animation-duration: 0s !important;
-            transition-duration: 0s !important;
-            caret-color: transparent !important;
-          }
-        `,
-      });
+      await stabilizeVisuals(page);
       await expect(page).toHaveScreenshot(`${name}.png`, {
         animations: "disabled",
         fullPage: true,
       });
     });
   }
+
+  test("auth guard redirects anonymous dashboard access", async ({ page }) => {
+    await preparePage(page, false);
+    await page.goto("/#/dashboard");
+    await page.waitForLoadState("networkidle");
+    await expect(page).toHaveURL(/#\/$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "登录" })
+    ).toBeVisible();
+  });
+
+  test("command menu and sidebar keyboard interactions", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard");
+    await page.waitForLoadState("networkidle");
+
+    await page.keyboard.press("Control+k");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByPlaceholder("输入页面名称或操作…")).toBeFocused();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("command-menu.png", {
+      animations: "disabled",
+      fullPage: true,
+    });
+    await page.keyboard.press("Escape");
+
+    await page
+      .getByRole("button", { exact: true, name: "Toggle Sidebar" })
+      .first()
+      .click();
+    await expect(
+      page.locator('[data-slot="sidebar"][data-state="collapsed"]')
+    ).toBeVisible();
+  });
+
+  test("mobile login and sidebar sheet", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await preparePage(page, false);
+    await page.goto("/#/");
+    await page.waitForLoadState("networkidle");
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("auth-mobile.png", {
+      animations: "disabled",
+      fullPage: true,
+    });
+
+    await page.context().addCookies([
+      {
+        name: "Authorization",
+        value: "visual-baseline",
+        url: "http://127.0.0.1:4173",
+      },
+    ]);
+    await page.goto("/#/dashboard");
+    await page.waitForLoadState("networkidle");
+    await page
+      .getByRole("button", { exact: true, name: "Toggle Sidebar" })
+      .first()
+      .click();
+    await expect(page.locator('[data-mobile="true"]')).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("sidebar-mobile.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
 });

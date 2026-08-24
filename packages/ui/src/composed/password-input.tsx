@@ -9,11 +9,13 @@ type PasswordInputProps = Omit<
   "type"
 > & {
   ref?: React.Ref<HTMLInputElement>;
+  inputClassName?: string;
 };
 
 export function PasswordInput({
   className,
   disabled,
+  inputClassName,
   ref,
   ...props
 }: PasswordInputProps) {
@@ -22,6 +24,7 @@ export function PasswordInput({
   return (
     <div className={cn("relative rounded-md", className)}>
       <Input
+        className={inputClassName}
         disabled={disabled}
         ref={ref}
         type={showPassword ? "text" : "password"}

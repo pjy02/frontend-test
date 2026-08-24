@@ -1,231 +1,278 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  Activity,
+  BadgeDollarSign,
+  BellRing,
+  ChartNoAxesCombined,
+  CreditCard,
+  FileText,
+  Gift,
+  Headphones,
+  KeyRound,
+  LayoutDashboard,
+  LifeBuoy,
+  ListTree,
+  LogIn,
+  Mail,
+  Megaphone,
+  MessageSquareText,
+  Network,
+  Package,
+  PanelTop,
+  Plug,
+  RadioTower,
+  RefreshCcw,
+  Server,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  ShoppingCart,
+  TicketPercent,
+  UserPlus,
+  Users,
+  WalletCards,
+  Wrench,
+} from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface NavItem {
   title: string;
   url?: string;
-  icon?: string;
+  icon: LucideIcon;
   items?: NavItem[];
   defaultOpen?: boolean;
+}
+
+export interface FlatNavItem extends NavItem {
+  group?: string;
+  url: string;
 }
 
 export function useNavs() {
   const { t } = useTranslation("menu");
 
-  const navs: NavItem[] = useMemo(
+  return useMemo<NavItem[]>(
     () => [
       {
         title: t("Dashboard", "Dashboard"),
         url: "/dashboard",
-        icon: "flat-color-icons:globe",
+        icon: LayoutDashboard,
       },
-
       {
         title: t("Maintenance", "Maintenance"),
-        icon: "flat-color-icons:data-protection",
+        icon: Wrench,
+        defaultOpen: true,
         items: [
           {
             title: t("Server Management", "Server Management"),
             url: "/dashboard/servers",
-            icon: "flat-color-icons:data-protection",
+            icon: Server,
           },
           {
             title: t("Node Management", "Node Management"),
             url: "/dashboard/nodes",
-            icon: "flat-color-icons:mind-map",
+            icon: Network,
           },
           {
             title: t("Subscribe Config", "Subscribe Config"),
             url: "/dashboard/subscribe",
-            icon: "flat-color-icons:ruler",
+            icon: RadioTower,
           },
           {
             title: t("Product Management", "Product Management"),
             url: "/dashboard/product",
-            icon: "flat-color-icons:shop",
+            icon: Package,
           },
         ],
       },
-
       {
         title: t("Commerce", "Commerce"),
-        icon: "flat-color-icons:sales-performance",
+        icon: ShoppingBag,
+        defaultOpen: true,
         items: [
           {
             title: t("Order Management", "Order Management"),
             url: "/dashboard/order",
-            icon: "flat-color-icons:todo-list",
+            icon: ShoppingCart,
           },
           {
             title: t("Coupon Management", "Coupon Management"),
             url: "/dashboard/coupon",
-            icon: "flat-color-icons:bookmark",
+            icon: TicketPercent,
           },
           {
             title: t("Marketing Management", "Marketing Management"),
             url: "/dashboard/marketing",
-            icon: "flat-color-icons:bullish",
+            icon: Megaphone,
           },
           {
             title: t("Announcement Management", "Announcement Management"),
             url: "/dashboard/announcement",
-            icon: "flat-color-icons:advertising",
+            icon: BellRing,
           },
         ],
       },
-
       {
         title: t("Users & Support", "Users & Support"),
-        icon: "flat-color-icons:collaboration",
+        icon: Headphones,
         items: [
           {
             title: t("User Management", "User Management"),
             url: "/dashboard/user",
-            icon: "flat-color-icons:conference-call",
+            icon: Users,
           },
           {
             title: t("Ticket Management", "Ticket Management"),
             url: "/dashboard/ticket",
-            icon: "flat-color-icons:collaboration",
+            icon: LifeBuoy,
           },
           {
             title: t("Document Management", "Document Management"),
             url: "/dashboard/document",
-            icon: "flat-color-icons:document",
+            icon: FileText,
           },
         ],
       },
-
       {
-        defaultOpen: false,
         title: t("System", "System"),
-        icon: "flat-color-icons:services",
+        icon: Settings,
         items: [
           {
             title: t("System Config", "System Config"),
             url: "/dashboard/system",
-            icon: "flat-color-icons:services",
+            icon: Settings,
           },
           {
             title: t("Auth Control", "Auth Control"),
             url: "/dashboard/auth-control",
-            icon: "flat-color-icons:lock-portrait",
+            icon: ShieldCheck,
           },
           {
             title: t("Payment Config", "Payment Config"),
             url: "/dashboard/payment",
-            icon: "flat-color-icons:currency-exchange",
+            icon: CreditCard,
           },
           {
             title: t("Plugin Management", "Plugin Management"),
             url: "/dashboard/plugin",
-            icon: "flat-color-icons:services",
+            icon: Plug,
           },
           {
             title: t("ADS Config", "ADS Config"),
             url: "/dashboard/ads",
-            icon: "flat-color-icons:electrical-sensor",
+            icon: PanelTop,
           },
         ],
       },
-
       {
-        defaultOpen: false,
         title: t("Logs & Analytics", "Logs & Analytics"),
-        icon: "flat-color-icons:statistics",
+        icon: ChartNoAxesCombined,
         items: [
           {
             title: t("Login", "Login"),
             url: "/dashboard/log/login",
-            icon: "flat-color-icons:unlock",
+            icon: LogIn,
           },
           {
             title: t("Register", "Register"),
             url: "/dashboard/log/register",
-            icon: "flat-color-icons:contacts",
+            icon: UserPlus,
           },
           {
             title: t("Email", "Email"),
             url: "/dashboard/log/email",
-            icon: "flat-color-icons:feedback",
+            icon: Mail,
           },
           {
             title: t("Mobile", "Mobile"),
             url: "/dashboard/log/mobile",
-            icon: "flat-color-icons:sms",
+            icon: MessageSquareText,
           },
           {
             title: t("Subscribe", "Subscribe"),
             url: "/dashboard/log/subscribe",
-            icon: "flat-color-icons:workflow",
+            icon: KeyRound,
           },
           {
             title: t("Reset Subscribe", "Reset Subscribe"),
             url: "/dashboard/log/reset-subscribe",
-            icon: "flat-color-icons:refresh",
+            icon: RefreshCcw,
           },
           {
             title: t("Subscribe Traffic", "Subscribe Traffic"),
             url: "/dashboard/log/subscribe-traffic",
-            icon: "flat-color-icons:statistics",
+            icon: Activity,
           },
           {
             title: t("Server Traffic", "Server Traffic"),
             url: "/dashboard/log/server-traffic",
-            icon: "flat-color-icons:statistics",
+            icon: ChartNoAxesCombined,
           },
           {
             title: t("Traffic Details", "Traffic Details"),
             url: "/dashboard/log/traffic-details",
-            icon: "flat-color-icons:combo-chart",
+            icon: ListTree,
           },
           {
             title: t("Balance", "Balance"),
             url: "/dashboard/log/balance",
-            icon: "flat-color-icons:sales-performance",
+            icon: WalletCards,
           },
           {
             title: t("Commission", "Commission"),
             url: "/dashboard/log/commission",
-            icon: "flat-color-icons:debt",
+            icon: BadgeDollarSign,
           },
           {
             title: t("Gift", "Gift"),
             url: "/dashboard/log/gift",
-            icon: "flat-color-icons:donate",
+            icon: Gift,
           },
         ],
       },
     ],
     [t]
   );
-
-  return navs;
 }
 
-export function findNavByUrl(navs: NavItem[], url: string) {
-  function matchDynamicRoute(pattern: string, path: string): boolean {
-    const regexPattern = pattern
-      .replace(/:[^/]+/g, "[^/]+")
-      .replace(/\//g, "\\/");
-    const regex = new RegExp(`^${regexPattern}$`);
-    return regex.test(path);
-  }
-  function findNav(
-    items: NavItem[],
-    url: string,
-    path: NavItem[] = []
-  ): NavItem[] {
-    for (const item of items) {
-      if (item.url === url || (item.url && matchDynamicRoute(item.url, url))) {
-        return [...path, item];
-      }
-      if (item.items) {
-        const result = findNav(item.items, url, [...path, item]);
-        if (result.length) return result;
-      }
+export function normalizeRoutePath(path: string) {
+  return path.endsWith("/") && path !== "/" ? path.replace(/\/+$/, "") : path;
+}
+
+export function isNavItemActive(pathname: string, url: string) {
+  const path = normalizeRoutePath(pathname);
+  const target = normalizeRoutePath(url);
+
+  if (target === "/dashboard") return path === target;
+  return path === target || path.startsWith(`${target}/`);
+}
+
+export function isNavGroupActive(pathname: string, item: NavItem): boolean {
+  if (item.url && isNavItemActive(pathname, item.url)) return true;
+  return (
+    item.items?.some((child) => isNavGroupActive(pathname, child)) ?? false
+  );
+}
+
+export function flattenNavs(navs: NavItem[]): FlatNavItem[] {
+  return navs.flatMap((item) => {
+    if (item.url) return [{ ...item, url: item.url }];
+    return (item.items ?? [])
+      .filter((child): child is NavItem & { url: string } => Boolean(child.url))
+      .map((child) => ({ ...child, group: item.title, url: child.url }));
+  });
+}
+
+export function findNavByUrl(navs: NavItem[], url: string): NavItem[] {
+  for (const item of navs) {
+    if (item.url && isNavItemActive(url, item.url)) return [item];
+    if (item.items) {
+      const child = item.items.find(
+        (navItem) => navItem.url && isNavItemActive(url, navItem.url)
+      );
+      if (child) return [item, child];
     }
-    return [];
   }
-  return findNav(navs, url);
+  return [];
 }

@@ -5,10 +5,13 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Icon } from "@workspace/ui/composed/icon";
+import { PasswordInput } from "@workspace/ui/composed/password-input";
+import { AtSign, LockKeyhole } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -59,21 +62,28 @@ export default function LoginForm({
   return (
     <>
       <Form {...form}>
-        <form className="grid gap-6" onSubmit={handleSubmit}>
+        <form className="grid gap-5" onSubmit={handleSubmit}>
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>{t("login.emailLabel", "Email address")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t(
-                      "login.emailPlaceholder",
-                      "Enter your email..."
-                    )}
-                    type="email"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <AtSign className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 z-10 size-4 text-muted-foreground" />
+                    <Input
+                      autoComplete="username"
+                      className="pl-9"
+                      disabled={loading}
+                      placeholder={t(
+                        "login.emailPlaceholder",
+                        "Enter your email..."
+                      )}
+                      type="email"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,15 +94,21 @@ export default function LoginForm({
             name="password"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>{t("login.passwordLabel", "Password")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t(
-                      "login.passwordPlaceholder",
-                      "Enter your password..."
-                    )}
-                    type="password"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <LockKeyhole className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 z-10 size-4 text-muted-foreground" />
+                    <PasswordInput
+                      autoComplete="current-password"
+                      disabled={loading}
+                      inputClassName="px-9"
+                      placeholder={t(
+                        "login.passwordPlaceholder",
+                        "Enter your password..."
+                      )}
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -116,13 +132,18 @@ export default function LoginForm({
               )}
             />
           )}
-          <Button disabled={loading} type="submit">
+          <Button
+            className="mt-1 w-full"
+            disabled={loading}
+            size="lg"
+            type="submit"
+          >
             {loading && <Icon className="animate-spin" icon="mdi:loading" />}
             {t("login.title", "Login")}
           </Button>
         </form>
       </Form>
-      <div className="mt-4 flex w-full justify-between text-sm">
+      <div className="mt-4 flex w-full justify-end text-sm">
         <Button
           className="p-0"
           onClick={() => onSwitchForm("reset")}
