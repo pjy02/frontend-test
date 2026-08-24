@@ -21,10 +21,12 @@ import {
 } from "@workspace/ui/components/sheet";
 import { MarkdownEditor } from "@workspace/ui/composed/editor/markdown";
 import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
 import {
   getTosConfig,
   updateTosConfig,
 } from "@workspace/ui/services/admin/system";
+import { ScrollText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -83,28 +85,14 @@ export default function TosConfig() {
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon
-                className="h-5 w-5 text-primary"
-                icon="mdi:file-document-outline"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("tos.title", "Terms of Service")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "tos.description",
-                  "Edit and manage terms of service content"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
+        <SettingsEntry
+          description={t(
+            "tos.description",
+            "Edit and manage terms of service content"
+          )}
+          icon={ScrollText}
+          title={t("tos.title", "Terms of Service")}
+        />
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
         <SheetHeader>

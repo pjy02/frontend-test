@@ -1,5 +1,7 @@
 {
   "basicSettings": "基本设置",
+  "basicSettingsDescription": "品牌、域名、货币与面向用户的法律内容。",
+  "changesApplyImmediately": "变更会立即生效",
   "common": {
     "cancel": "取消",
     "save": "保存设置",
@@ -42,6 +44,12 @@
     "title": "日志清理设置"
   },
   "logSettings": "日志设置",
+  "logSettingsDescription": "运营记录的保留期限与自动清理策略。",
+  "pageDescription": "配置产品默认值、账户安全和运营策略。",
+  "pageEyebrow": "管理设置",
+  "pageTitle": "系统设置",
+  "settingsNavigation": "设置导航",
+  "saveGuidance": "保存前请检查会影响用户端展示的变更。",
   "privacyPolicy": {
     "description": "编辑和管理隐私政策内容",
     "title": "隐私政策"
@@ -100,6 +108,7 @@
     "title": "服务条款"
   },
   "userSecuritySettings": "用户与安全",
+  "userSecurityDescription": "注册、邀请、验证与滥用防护。",
   "verify": {
     "description": "配置 Turnstile 验证码和验证设置",
     "enableLoginVerify": "登录验证",

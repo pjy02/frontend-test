@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   Card,
+  CardAction,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
@@ -16,13 +18,22 @@ import {
 // (Select imports removed)
 import { Separator } from "@workspace/ui/components/separator";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
-import Empty from "@workspace/ui/composed/empty";
-import { Icon } from "@workspace/ui/composed/icon";
+import { EmptyState } from "@workspace/ui/composed/async-state";
 import {
   queryServerTotalData,
   queryTicketWaitReply,
 } from "@workspace/ui/services/admin/console";
 import { formatBytes } from "@workspace/ui/utils/formatting";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Cloud,
+  Gauge,
+  Server,
+  TicketCheck,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -94,20 +105,28 @@ export default function Statistics() {
 
     return (
       <Card>
-        <CardHeader className="!flex-row flex items-center justify-between">
+        <CardHeader>
           <CardTitle>
             {type === "nodes"
               ? t("nodeTraffic", "Node Traffic")
               : t("userTraffic", "User Traffic")}
           </CardTitle>
-          <Tabs onValueChange={setTimeFrame} value={timeFrame}>
-            <TabsList>
-              <TabsTrigger value="today">{t("today", "Today")}</TabsTrigger>
-              <TabsTrigger value="yesterday">
-                {t("yesterday", "Yesterday")}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <CardDescription>
+            {t(
+              "trafficRankDescription",
+              "Highest combined upload and download"
+            )}
+          </CardDescription>
+          <CardAction>
+            <Tabs onValueChange={setTimeFrame} value={timeFrame}>
+              <TabsList>
+                <TabsTrigger value="today">{t("today", "Today")}</TabsTrigger>
+                <TabsTrigger value="yesterday">
+                  {t("yesterday", "Yesterday")}
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </CardAction>
         </CardHeader>
         <CardContent className="h-80">
           {currentData.length > 0 ? (
@@ -180,7 +199,8 @@ export default function Statistics() {
                 />
                 <Bar
                   dataKey="traffic"
-                  fill="var(--primary)"
+                  fill="var(--color-traffic)"
+                  isAnimationActive={false}
                   radius={[0, 4, 4, 0]}
                 >
                   <LabelList
@@ -194,9 +214,14 @@ export default function Statistics() {
               </BarChart>
             </ChartContainer>
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <Empty />
-            </div>
+            <EmptyState
+              compact
+              description={t(
+                "trafficEmptyDescription",
+                "Traffic rankings will appear after data is reported."
+              )}
+              title={t("trafficEmpty", "No traffic data")}
+            />
           )}
         </CardContent>
       </Card>
@@ -205,16 +230,15 @@ export default function Statistics() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {[
           {
             title: t("onlineUsersCount", "Online Users"),
             value: ServerTotal?.online_users || 0,
             subtitle: t("currentlyOnline", "Currently Online"),
-            icon: "uil:users-alt",
+            icon: Users,
             href: "/dashboard/servers",
-            color: "text-blue-600 dark:text-blue-400",
-            iconBg: "bg-blue-100 dark:bg-blue-900/30",
+            iconClassName: "bg-primary/10 text-primary",
           },
 
           {
@@ -224,9 +248,8 @@ export default function Statistics() {
                 (ServerTotal?.today_download || 0)
             ),
             subtitle: `↑${formatBytes(ServerTotal?.today_upload || 0)} ↓${formatBytes(ServerTotal?.today_download || 0)}`,
-            icon: "uil:exchange-alt",
-            color: "text-purple-600 dark:text-purple-400",
-            iconBg: "bg-purple-100 dark:bg-purple-900/30",
+            icon: Gauge,
+            iconClassName: "bg-info/10 text-info",
           },
           {
             title: t("monthTraffic", "Month Traffic"),
@@ -235,9 +258,8 @@ export default function Statistics() {
                 (ServerTotal?.monthly_download || 0)
             ),
             subtitle: `↑${formatBytes(ServerTotal?.monthly_upload || 0)} ↓${formatBytes(ServerTotal?.monthly_download || 0)}`,
-            icon: "uil:cloud-data-connection",
-            color: "text-orange-600 dark:text-orange-400",
-            iconBg: "bg-orange-100 dark:bg-orange-900/30",
+            icon: Cloud,
+            iconClassName: "bg-warning/12 text-warning",
           },
           {
             title: t("totalServers", "Total Servers"),
@@ -245,19 +267,17 @@ export default function Statistics() {
               (ServerTotal?.online_servers || 0) +
               (ServerTotal?.offline_servers || 0),
             subtitle: `${t("online", "Online")} ${ServerTotal?.online_servers || 0} ${t("offline", "Offline")} ${ServerTotal?.offline_servers || 0}`,
-            icon: "uil:server-network",
+            icon: Server,
             href: "/dashboard/servers",
-            color: "text-green-600 dark:text-green-400",
-            iconBg: "bg-green-100 dark:bg-green-900/30",
+            iconClassName: "bg-success/10 text-success",
           },
           {
             title: t("pendingTickets", "Pending Tickets"),
             value: TicketTotal || 0,
             subtitle: t("pending", "Pending"),
-            icon: "uil:clipboard-notes",
+            icon: TicketCheck,
             href: "/dashboard/ticket",
-            color: "text-red-600 dark:text-red-400",
-            iconBg: "bg-red-100 dark:bg-red-900/30",
+            iconClassName: "bg-destructive/10 text-destructive",
           },
         ].map((item, index) => (
           <Link
@@ -265,41 +285,43 @@ export default function Statistics() {
             key={index}
             to={item.href || "#"}
           >
-            <Card className={`group ${item.href ? "cursor-pointer" : ""}`}>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="mb-2 font-medium text-muted-foreground text-sm">
-                      {item.title}
-                    </p>
-                    <div className={`mb-1 font-bold text-2xl ${item.color}`}>
-                      {item.value}
-                    </div>
-                    <div className="h-4 text-muted-foreground text-xs">
-                      {item.subtitle}
-                    </div>
+            <Card
+              className={`group h-full transition-[border-color,box-shadow,transform] duration-[var(--motion-duration-normal)] ${item.href ? "hover:-translate-y-0.5 cursor-pointer hover:border-primary/25 hover:shadow-[var(--shadow-md)]" : ""}`}
+            >
+              <CardContent className="flex h-full items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-muted-foreground text-sm">
+                    {item.title}
+                  </p>
+                  <div className="mt-2 font-semibold text-2xl tabular-nums tracking-tight">
+                    {item.value}
                   </div>
-                  <div
-                    className={`rounded-full p-3 ${item.iconBg} transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    <Icon
-                      className={`h-6 w-6 ${item.color}`}
-                      icon={item.icon}
-                    />
+                  <div className="mt-1 flex min-h-4 items-center gap-1 text-muted-foreground text-xs">
+                    {index === 1 && <ArrowUp className="size-3 text-success" />}
+                    {index === 1 && <ArrowDown className="size-3 text-info" />}
+                    {item.subtitle}
                   </div>
                 </div>
+                <div
+                  className={`grid size-10 shrink-0 place-items-center rounded-xl ${item.iconClassName}`}
+                >
+                  <item.icon className="size-5" />
+                </div>
+                {item.href && (
+                  <ArrowRight className="absolute right-5 bottom-5 size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                )}
               </CardContent>
             </Card>
           </Link>
         ))}
         <SystemVersionCard />
       </div>
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <RevenueStatisticsCard />
         <UserStatisticsCard />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <TrafficRankCard type="nodes" />
         <TrafficRankCard type="users" />
       </div>

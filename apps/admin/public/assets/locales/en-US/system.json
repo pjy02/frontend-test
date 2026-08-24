@@ -1,5 +1,7 @@
 {
   "basicSettings": "Basic Settings",
+  "basicSettingsDescription": "Brand, domains, currency, and customer-facing legal content.",
+  "changesApplyImmediately": "Changes apply immediately",
   "common": {
     "cancel": "Cancel",
     "save": "Save Settings",
@@ -42,6 +44,12 @@
     "title": "Log Cleanup Settings"
   },
   "logSettings": "Log Settings",
+  "logSettingsDescription": "Retention and automatic cleanup for operational records.",
+  "pageDescription": "Configure product defaults, account security, and operational policies.",
+  "pageEyebrow": "Administration",
+  "pageTitle": "System Settings",
+  "settingsNavigation": "Settings navigation",
+  "saveGuidance": "Review customer-facing changes before saving.",
   "privacyPolicy": {
     "description": "Edit and manage privacy policy content",
     "title": "Privacy Policy"
@@ -100,6 +108,7 @@
     "title": "Terms of Service"
   },
   "userSecuritySettings": "User & Security",
+  "userSecurityDescription": "Registration, invitations, verification, and abuse protection.",
   "verify": {
     "description": "Configure Turnstile CAPTCHA and verification settings",
     "enableLoginVerify": "Enable Verification on Login",

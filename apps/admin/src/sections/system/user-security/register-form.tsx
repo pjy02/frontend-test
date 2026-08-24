@@ -23,10 +23,12 @@ import { Switch } from "@workspace/ui/components/switch";
 import { Combobox } from "@workspace/ui/composed/combobox";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
 import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
 import {
   getRegisterConfig,
   updateRegisterConfig,
 } from "@workspace/ui/services/admin/system";
+import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -100,28 +102,14 @@ export default function RegisterConfig() {
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon
-                className="h-5 w-5 text-primary"
-                icon="mdi:account-plus-outline"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("register.title", "Registration Settings")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "register.description",
-                  "Configure user registration related settings"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
+        <SettingsEntry
+          description={t(
+            "register.description",
+            "Configure user registration related settings"
+          )}
+          icon={UserPlus}
+          title={t("register.title", "Registration Settings")}
+        />
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
         <SheetHeader>

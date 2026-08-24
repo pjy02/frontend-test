@@ -22,10 +22,12 @@ import {
 import { Switch } from "@workspace/ui/components/switch";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
 import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
 import {
   getVerifyConfig,
   updateVerifyConfig,
 } from "@workspace/ui/services/admin/system";
+import { ShieldEllipsis } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -90,28 +92,14 @@ export default function VerifyConfig() {
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon
-                className="h-5 w-5 text-primary"
-                icon="mdi:shield-check-outline"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("verify.title", "Security Verification")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "verify.description",
-                  "Configure Turnstile CAPTCHA and verification settings"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
+        <SettingsEntry
+          description={t(
+            "verify.description",
+            "Configure Turnstile CAPTCHA and verification settings"
+          )}
+          icon={ShieldEllipsis}
+          title={t("verify.title", "Security Verification")}
+        />
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
         <SheetHeader>

@@ -21,10 +21,12 @@ import {
 } from "@workspace/ui/components/sheet";
 import { MarkdownEditor } from "@workspace/ui/composed/editor/index";
 import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
 import {
   getPrivacyPolicyConfig,
   updatePrivacyPolicyConfig,
 } from "@workspace/ui/services/admin/system";
+import { ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -83,28 +85,14 @@ export default function PrivacyPolicyConfig() {
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon
-                className="h-5 w-5 text-primary"
-                icon="mdi:shield-account-outline"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("privacyPolicy.title", "Privacy Policy")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "privacyPolicy.description",
-                  "Edit and manage privacy policy content"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
+        <SettingsEntry
+          description={t(
+            "privacyPolicy.description",
+            "Edit and manage privacy policy content"
+          )}
+          icon={ShieldCheck}
+          title={t("privacyPolicy.title", "Privacy Policy")}
+        />
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
         <SheetHeader>

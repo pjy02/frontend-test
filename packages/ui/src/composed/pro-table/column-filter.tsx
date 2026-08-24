@@ -3,8 +3,10 @@
 import type { Table } from "@tanstack/react-table";
 import { Input } from "@workspace/ui/components/input";
 import { Combobox } from "@workspace/ui/composed/combobox";
+import { cn } from "@workspace/ui/lib/utils";
 
 export interface IParams {
+  className?: string;
   key: string;
   placeholder?: string;
   options?: { label: string; value: string }[];
@@ -48,7 +50,7 @@ export function ColumnFilter<TData>({
         if (param.options || param.type === "select") {
           return (
             <Combobox
-              className="min-w-32 max-w-48"
+              className={cn("min-w-32 max-w-48", param.className)}
               key={param.key}
               onChange={(value) => {
                 updateFilter(param.key, value);
@@ -69,7 +71,7 @@ export function ColumnFilter<TData>({
                 : "";
           return (
             <Input
-              className="block min-w-32"
+              className={cn("block min-w-32 sm:w-auto", param.className)}
               key={param.key}
               onChange={(event) => {
                 const v = event.target.value;
@@ -83,7 +85,7 @@ export function ColumnFilter<TData>({
         }
         return (
           <Input
-            className="min-w-32"
+            className={cn("min-w-40 sm:w-52", param.className)}
             key={param.key}
             onChange={(event) => updateFilter(param.key, event.target.value)}
             placeholder={param.placeholder || "Search..."}

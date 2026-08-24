@@ -10,6 +10,9 @@ handling are defined in [`application-shell.md`](./application-shell.md).
 Phase 3 page composition, data surfaces, detail workflows, and asynchronous
 states are defined in [`page-patterns.md`](./page-patterns.md).
 
+Phase 4 production acceptance for dashboard, user operations, and system
+settings is defined in [`vertical-templates.md`](./vertical-templates.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations

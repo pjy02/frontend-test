@@ -62,6 +62,7 @@ import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { FilterBar, FilterSearch } from "@workspace/ui/composed/filter-bar";
 import { FormSection } from "@workspace/ui/composed/form-section";
 import { PageHeader } from "@workspace/ui/composed/page-header";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
 import { StatusBadge } from "@workspace/ui/composed/status-badge";
 import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import {
@@ -77,6 +78,8 @@ import {
   Check,
   CheckCircle2,
   CircleAlert,
+  CircleDollarSign,
+  Globe2,
   Info,
   Moon,
   Palette,
@@ -646,6 +649,31 @@ function PageStandardsPreview() {
           />
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>设置目录</CardTitle>
+          <CardDescription>
+            使用仓库内图标、说明文本和统一的进入反馈组织设置入口。
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="divide-y p-0">
+          <div className="px-6 py-4">
+            <SettingsEntry
+              description="配置站点名称、Logo、域名和基础展示信息。"
+              icon={Globe2}
+              title="站点配置"
+            />
+          </div>
+          <div className="px-6 py-4">
+            <SettingsEntry
+              description="配置货币单位、显示符号和汇率服务。"
+              icon={CircleDollarSign}
+              title="货币配置"
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -794,7 +822,7 @@ export default function UiLab() {
                 <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                   <Palette className="size-5" />
                 </div>
-                <Badge variant="secondary">Design System · Phase 1–3</Badge>
+                <Badge variant="secondary">Design System · Phase 1–4</Badge>
               </div>
               <h1 className="type-display">Perfect Panel UI Lab</h1>
               <p className="mt-4 max-w-2xl text-base text-muted-foreground leading-relaxed">
@@ -878,8 +906,8 @@ export default function UiLab() {
         </div>
 
         <footer className="mt-12 flex flex-col gap-2 border-t py-8 text-muted-foreground text-xs sm:flex-row sm:items-center sm:justify-between">
-          <span>Perfect Panel Design System · Phase 1–3</span>
-          <span>Foundation · Shell · Page Patterns</span>
+          <span>Perfect Panel Design System · Phase 1–4</span>
+          <span>Foundation · Shell · Page Patterns · Vertical Templates</span>
         </footer>
       </div>
     </main>

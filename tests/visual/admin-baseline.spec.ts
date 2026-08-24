@@ -37,43 +37,157 @@ const commonData = {
   count: 0,
   list: [],
   total: 0,
-  online_users: 0,
-  online_servers: 0,
-  offline_servers: 0,
-  today_upload: 0,
-  today_download: 0,
-  monthly_upload: 0,
-  monthly_download: 0,
-  server_traffic_ranking_today: [],
-  server_traffic_ranking_yesterday: [],
-  user_traffic_ranking_today: [],
-  user_traffic_ranking_yesterday: [],
+  online_users: 128,
+  online_servers: 12,
+  offline_servers: 2,
+  today_upload: 18_400_000_000,
+  today_download: 54_700_000_000,
+  monthly_upload: 328_000_000_000,
+  monthly_download: 984_000_000_000,
+  server_traffic_ranking_today: [
+    { server_id: 1, name: "Hong Kong Edge 01", upload: 8e9, download: 24e9 },
+    { server_id: 2, name: "Tokyo Core 02", upload: 6e9, download: 18e9 },
+    { server_id: 3, name: "Frankfurt Edge", upload: 4e9, download: 12e9 },
+  ],
+  server_traffic_ranking_yesterday: [
+    { server_id: 1, name: "Hong Kong Edge 01", upload: 7e9, download: 21e9 },
+    { server_id: 2, name: "Tokyo Core 02", upload: 5e9, download: 16e9 },
+  ],
+  user_traffic_ranking_today: [
+    { sid: 101, uid: 1001, upload: 3e9, download: 9e9 },
+    { sid: 102, uid: 1002, upload: 2e9, download: 7e9 },
+  ],
+  user_traffic_ranking_yesterday: [
+    { sid: 101, uid: 1001, upload: 2e9, download: 8e9 },
+  ],
 };
 
 const revenueStatistics = {
   today: {
-    amount_total: 0,
-    new_order_amount: 0,
-    renewal_order_amount: 0,
+    amount_total: 328_600,
+    new_order_amount: 214_800,
+    renewal_order_amount: 113_800,
   },
   monthly: {
-    amount_total: 0,
-    new_order_amount: 0,
-    renewal_order_amount: 0,
+    amount_total: 8_420_000,
+    new_order_amount: 5_360_000,
+    renewal_order_amount: 3_060_000,
+    list: [
+      {
+        date: "2026-08-18",
+        amount_total: 910_000,
+        new_order_amount: 580_000,
+        renewal_order_amount: 330_000,
+      },
+      {
+        date: "2026-08-19",
+        amount_total: 1_020_000,
+        new_order_amount: 640_000,
+        renewal_order_amount: 380_000,
+      },
+      {
+        date: "2026-08-20",
+        amount_total: 1_180_000,
+        new_order_amount: 760_000,
+        renewal_order_amount: 420_000,
+      },
+      {
+        date: "2026-08-21",
+        amount_total: 960_000,
+        new_order_amount: 610_000,
+        renewal_order_amount: 350_000,
+      },
+      {
+        date: "2026-08-22",
+        amount_total: 1_310_000,
+        new_order_amount: 820_000,
+        renewal_order_amount: 490_000,
+      },
+    ],
+  },
+  all: {
+    amount_total: 38_420_000,
+    new_order_amount: 24_360_000,
+    renewal_order_amount: 14_060_000,
     list: [],
   },
-  all: { amount_total: 0, list: [] },
 };
 
 const userStatistics = {
-  today: { register: 0, new_order_users: 0, renewal_order_users: 0 },
+  today: { register: 42, new_order_users: 28, renewal_order_users: 19 },
   monthly: {
-    register: 0,
-    new_order_users: 0,
-    renewal_order_users: 0,
+    register: 924,
+    new_order_users: 618,
+    renewal_order_users: 382,
+    list: [
+      {
+        date: "2026-08-18",
+        register: 122,
+        new_order_users: 78,
+        renewal_order_users: 46,
+      },
+      {
+        date: "2026-08-19",
+        register: 136,
+        new_order_users: 86,
+        renewal_order_users: 51,
+      },
+      {
+        date: "2026-08-20",
+        register: 148,
+        new_order_users: 97,
+        renewal_order_users: 58,
+      },
+      {
+        date: "2026-08-21",
+        register: 118,
+        new_order_users: 74,
+        renewal_order_users: 43,
+      },
+      {
+        date: "2026-08-22",
+        register: 164,
+        new_order_users: 108,
+        renewal_order_users: 66,
+      },
+    ],
+  },
+  all: {
+    register: 12_840,
+    new_order_users: 8240,
+    renewal_order_users: 5180,
     list: [],
   },
-  all: { register: 0, list: [] },
+};
+
+const visualUser = {
+  id: 1001,
+  avatar: "",
+  balance: 128_600,
+  commission: 24_800,
+  referral_percentage: 12,
+  only_first_purchase: true,
+  gift_amount: 5000,
+  telegram: 0,
+  refer_code: "PPANEL24",
+  referer_id: 0,
+  enable: true,
+  is_admin: false,
+  enable_balance_notify: true,
+  enable_login_notify: true,
+  enable_subscribe_notify: true,
+  enable_trade_notify: false,
+  auth_methods: [
+    {
+      auth_type: "email",
+      auth_identifier: "member@example.com",
+      verified: true,
+    },
+  ],
+  user_devices: [],
+  rules: [],
+  created_at: 1_724_515_200,
+  updated_at: 1_724_601_600,
 };
 
 const globalConfig = {
@@ -149,6 +263,21 @@ function responseFor(url: URL) {
       id: 1,
       avatar: "",
       auth_methods: [{ auth_identifier: "admin@example.com" }],
+    };
+  }
+  if (url.pathname.endsWith("/v1/admin/user/list")) {
+    return { count: 1, list: [visualUser], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/user/detail")) return visualUser;
+  if (url.pathname.endsWith("/v1/admin/system/site_config")) {
+    return {
+      site_logo: "/favicon.svg",
+      site_name: "PPanel Visual Baseline",
+      site_desc: "Admin redesign vertical template",
+      keywords: "panel, operations",
+      custom_html: "",
+      host: "panel.example.com",
+      custom_data: {},
     };
   }
   return commonData;
@@ -262,6 +391,39 @@ test.describe("admin phase 0 visual baseline", () => {
     await expect(detailSheet).toBeVisible();
     await stabilizeVisuals(page);
     await expect(page).toHaveScreenshot("announcement-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("user vertical template and profile detail", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/user");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "用户列表" })
+    ).toBeVisible();
+    await expect(page.getByText("member@example.com")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "编辑" }).click();
+    await expect(page.getByRole("dialog", { name: /用户资料/ })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("user-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("system vertical template and settings form", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/system");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "系统设置" })
+    ).toBeVisible();
+    await page.getByText("站点配置", { exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "站点配置" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("system-settings-sheet.png", {
       animations: "disabled",
       fullPage: false,
     });
