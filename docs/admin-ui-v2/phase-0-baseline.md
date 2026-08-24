@@ -1,6 +1,6 @@
-# Admin UI v2 phase 0 baseline
+# Admin redesign phase 0 baseline
 
-Source commit: `2d6c3b5474ec1efe7e5c6d55910ad767bcd7f3f7`
+Source commit: `aceb555862c8f393703df7a2d5452b029885ed19`
 
 Routes: 30; reachable service operations: 202.
 

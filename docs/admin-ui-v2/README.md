@@ -1,4 +1,4 @@
-# Admin UI v2 - Phase 0
+# Admin redesign - Phase 0
 
 Phase 0 freezes the current admin UI as a measurable baseline before the
 shadcn/ui redesign starts. It does not publish a package or create a release;
@@ -57,25 +57,16 @@ Review the changed PNG files before committing them. These screenshots use API
 fixtures and are a visual contract, not proof that a real backend operation
 succeeds.
 
-## Admin UI v2 switch
+## Single-interface migration
 
-`VITE_ADMIN_UI_V2` selects the layout boundary used by the dashboard route:
+There is no Admin UI v2 feature flag and no parallel legacy shell. Redesign
+work replaces the existing route, layout, and feature components directly.
+Once a page is rebuilt and its behavior is verified, its old implementation is
+deleted rather than retained as a fallback.
 
-```env
-VITE_ADMIN_UI_V2=false
-```
-
-- `false` or unset: current admin shell.
-- `true` or `1`: `AdminShellV2` migration boundary.
-
-The v2 boundary intentionally delegates to the current shell in Phase 0, so
-turning it on is safe before redesign work begins. Future phases replace the
-implementation behind this boundary. Since the final product does not need to
-retain the old UI, remove the old shell and this temporary switch after the v2
-route set reaches functional and visual parity.
-
-For Vercel, add `VITE_ADMIN_UI_V2` to the admin project's environment variables
-and redeploy when a preview of the new shell is needed.
+The Phase 0 screenshots are test references only. They allow the new interface
+to be checked for missing routes, actions, and states, but they do not provide a
+runtime path back to the old interface.
 
 ## Local verification
 

@@ -172,7 +172,7 @@ const operationCount = records.reduce(
 );
 
 const lines = [
-  "# Admin UI v2 phase 0 baseline",
+  "# Admin redesign phase 0 baseline",
   "",
   `Source commit: \`${commit}\``,
   "",

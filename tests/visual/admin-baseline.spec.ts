@@ -80,7 +80,7 @@ const globalConfig = {
   site: {
     host: "http://127.0.0.1:4173",
     site_name: "PPanel Visual Baseline",
-    site_desc: "Admin UI v2 phase 0",
+    site_desc: "Admin redesign phase 0",
     site_logo: "/favicon.svg",
     keywords: "",
     custom_html: "",
@@ -182,7 +182,7 @@ async function preparePage(page: Page, authenticated: boolean) {
   await page.route("**/v1/**", mockApi);
 }
 
-test.describe("legacy admin visual baseline", () => {
+test.describe("admin phase 0 visual baseline", () => {
   test.describe.configure({ mode: "serial" });
 
   for (const [name, route] of adminRoutes) {
