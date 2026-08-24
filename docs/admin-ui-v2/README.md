@@ -1,5 +1,8 @@
 # Admin redesign - Phase 0
 
+> Phase 1 design-system rules and the interactive UI Lab are documented in
+> [`../design-system/README.md`](../design-system/README.md).
+
 Phase 0 freezes the current admin UI as a measurable baseline before the
 shadcn/ui redesign starts. It does not publish a package or create a release;
 Vercel remains responsible for deployment.

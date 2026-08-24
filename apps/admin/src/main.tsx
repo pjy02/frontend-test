@@ -13,6 +13,7 @@ import ReactDOM from "react-dom/client";
 import { routeTree } from "./routeTree.gen";
 // Styles
 import "@workspace/ui/globals.css";
+import { DensityProvider } from "@workspace/ui/integrations/density";
 import { DirectionProvider } from "@workspace/ui/integrations/direction";
 import { LanguageProvider } from "@workspace/ui/integrations/language";
 import { ThemeProvider } from "@workspace/ui/integrations/theme";
@@ -70,9 +71,11 @@ if (rootElement && !rootElement.innerHTML) {
         <TanStackQueryProvider {...TanStackQueryProviderContext}>
           <LanguageProvider supportedLanguages={supportedLngs}>
             <ThemeProvider>
-              <DirectionProvider>
-                <RouterProvider router={router} />
-              </DirectionProvider>
+              <DensityProvider>
+                <DirectionProvider>
+                  <RouterProvider router={router} />
+                </DirectionProvider>
+              </DensityProvider>
             </ThemeProvider>
           </LanguageProvider>
         </TanStackQueryProvider>

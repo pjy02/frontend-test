@@ -12,6 +12,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 
+const UiLabLazyRouteImport = createFileRoute('/ui-lab')()
 const DashboardRouteLazyRouteImport = createFileRoute('/dashboard')()
 const IndexLazyRouteImport = createFileRoute('/')()
 const DashboardIndexLazyRouteImport = createFileRoute('/dashboard/')()
@@ -84,6 +85,11 @@ const DashboardLogBalanceLazyRouteImport = createFileRoute(
   '/dashboard/log/balance',
 )()
 
+const UiLabLazyRoute = UiLabLazyRouteImport.update({
+  id: '/ui-lab',
+  path: '/ui-lab',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/ui-lab.lazy').then((d) => d.Route))
 const DashboardRouteLazyRoute = DashboardRouteLazyRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -322,6 +328,7 @@ const DashboardLogBalanceLazyRoute = DashboardLogBalanceLazyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardRouteLazyRouteWithChildren
+  '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
   '/dashboard/servers': typeof DashboardServersLazyRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
   '/dashboard/servers': typeof DashboardServersLazyRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardRouteLazyRouteWithChildren
+  '/ui-lab': typeof UiLabLazyRoute
   '/dashboard/nodes': typeof DashboardNodesLazyRoute
   '/dashboard/plugin': typeof DashboardPluginLazyRoute
   '/dashboard/servers': typeof DashboardServersLazyRoute
@@ -423,6 +432,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/ui-lab'
     | '/dashboard/nodes'
     | '/dashboard/plugin'
     | '/dashboard/servers'
@@ -455,6 +465,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ui-lab'
     | '/dashboard/nodes'
     | '/dashboard/plugin'
     | '/dashboard/servers'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/ui-lab'
     | '/dashboard/nodes'
     | '/dashboard/plugin'
     | '/dashboard/servers'
@@ -522,10 +534,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   DashboardRouteLazyRoute: typeof DashboardRouteLazyRouteWithChildren
+  UiLabLazyRoute: typeof UiLabLazyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/ui-lab': {
+      id: '/ui-lab'
+      path: '/ui-lab'
+      fullPath: '/ui-lab'
+      preLoaderRoute: typeof UiLabLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -816,6 +836,7 @@ const DashboardRouteLazyRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   DashboardRouteLazyRoute: DashboardRouteLazyRouteWithChildren,
+  UiLabLazyRoute: UiLabLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
