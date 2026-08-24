@@ -16,6 +16,10 @@ settings is defined in [`vertical-templates.md`](./vertical-templates.md).
 Phase 5 routine commerce, content, support, marketing, and payment workflows are
 defined in [`business-pages.md`](./business-pages.md).
 
+Phase 6 infrastructure, subscription delivery, product composition, identity,
+and plugin lifecycle workspaces are defined in
+[`complex-workspaces.md`](./complex-workspaces.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations

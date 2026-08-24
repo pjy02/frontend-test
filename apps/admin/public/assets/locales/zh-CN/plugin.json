@@ -1,4 +1,8 @@
 {
+  "pageDescription": "安装、验证、检查并控制沙箱插件运行时。",
+  "pageEyebrow": "扩展能力",
+  "runtimeManaged": "运行时生命周期管理",
+  "detailDescription": "查看插件清单、健康状态、路由、中间件与事件订阅。",
   "asyncInflight": "异步进行中",
   "author": "作者",
   "cancel": "取消",

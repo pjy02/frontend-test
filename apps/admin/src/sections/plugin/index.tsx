@@ -12,9 +12,10 @@ import {
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 import { ConfirmButton } from "@workspace/ui/composed/confirm-button";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
+import { PageHeader } from "@workspace/ui/composed/page-header";
 import {
   ProTable,
   type ProTableActions,
@@ -81,224 +82,239 @@ export default function PluginManagement() {
   const getStatusLabel = (status: PluginStatus) =>
     t(`statusLabels.${status}`, status);
 
+  const pageActions = (
+    <>
+      <PluginUploadDialog onUploaded={refresh} />
+      <ConfirmButton
+        cancelText={t("cancel", "Cancel")}
+        confirmText={t("confirm", "Confirm")}
+        description={t(
+          "reloadAllDescription",
+          "All running plugin instances will be stopped, the plugin directory will be scanned again, and allowed plugins will be loaded."
+        )}
+        onConfirm={async () => {
+          await reloadAllPlugins();
+          toast.success(t("reloadAllCompleted", "Reloaded plugins"));
+          refresh();
+        }}
+        title={t("reloadAllTitle", "Reload all plugins?")}
+        trigger={
+          <Button variant="outline">
+            <RotateCcw />
+            {t("reloadAll", "Reload all")}
+          </Button>
+        }
+      />
+    </>
+  );
+
   return (
-    <ProTable<PluginInfo, { q?: string; status?: string }>
-      action={tableRef}
-      actions={{
-        render: (row) => [
-          <PluginDetailDialog key="detail" plugin={row} />,
-          row.status === "unloaded" ? (
-            <Button
-              key="enable"
-              onClick={async () => {
-                await enablePlugin(row.name);
-                toast.success(t("enabled", "Enabled"));
+    <div className="grid gap-5">
+      <PageHeader
+        actions={pageActions}
+        description={t(
+          "pageDescription",
+          "Install, validate, inspect, and control sandboxed plugin runtimes."
+        )}
+        eyebrow={t("pageEyebrow", "Extensibility")}
+        metadata={
+          <Badge variant="outline">
+            {t("runtimeManaged", "Runtime-managed lifecycle")}
+          </Badge>
+        }
+        title={t("title", "Plugins")}
+      />
+      <ProTable<PluginInfo, { q?: string; status?: string }>
+        action={tableRef}
+        actions={{
+          render: (row) => [
+            <PluginDetailDialog key="detail" plugin={row} />,
+            row.status === "unloaded" ? (
+              <Button
+                key="enable"
+                onClick={async () => {
+                  await enablePlugin(row.name);
+                  toast.success(t("enabled", "Enabled"));
+                  refresh();
+                }}
+                size="sm"
+                variant="outline"
+              >
+                <Power />
+                {t("enable", "Enable")}
+              </Button>
+            ) : (
+              <ConfirmButton
+                cancelText={t("cancel", "Cancel")}
+                confirmText={t("confirm", "Confirm")}
+                description={t(
+                  "disableDescription",
+                  "The plugin runtime will be stopped and its dynamic routes, middleware, events and scheduled tasks will be removed."
+                )}
+                key="disable"
+                onConfirm={async () => {
+                  await disablePlugin(row.name);
+                  toast.success(t("disabled", "Disabled"));
+                  refresh();
+                }}
+                title={t("disableTitle", "Disable plugin?")}
+                trigger={
+                  <Button size="sm" variant="outline">
+                    <PowerOff />
+                    {t("disable", "Disable")}
+                  </Button>
+                }
+              />
+            ),
+            <ConfirmButton
+              cancelText={t("cancel", "Cancel")}
+              confirmText={t("confirm", "Confirm")}
+              description={t(
+                "reloadDescription",
+                "The current WASM instance will be stopped and the plugin will be loaded again from disk."
+              )}
+              key="reload"
+              onConfirm={async () => {
+                await restartPlugin(row.name);
+                toast.success(t("restarted", "Restarted"));
                 refresh();
+              }}
+              title={t("restartTitle", "Restart plugin?")}
+              trigger={
+                <Button
+                  disabled={row.status === "unloaded"}
+                  size="sm"
+                  variant="outline"
+                >
+                  <RotateCcw />
+                  {t("restart", "Restart")}
+                </Button>
+              }
+            />,
+            <Button
+              key="validate"
+              onClick={async () => {
+                const { data } = await validatePlugin(row.name);
+                if (data.data?.valid) {
+                  toast.success(t("validationPassed", "Validation passed"));
+                } else {
+                  toast.error(
+                    data.data?.error ||
+                      t("validationFailed", "Validation failed")
+                  );
+                }
               }}
               size="sm"
               variant="outline"
             >
-              <Power />
-              {t("enable", "Enable")}
-            </Button>
-          ) : (
-            <ConfirmButton
-              cancelText={t("cancel", "Cancel")}
-              confirmText={t("confirm", "Confirm")}
-              description={t(
-                "disableDescription",
-                "The plugin runtime will be stopped and its dynamic routes, middleware, events and scheduled tasks will be removed."
-              )}
-              key="disable"
-              onConfirm={async () => {
-                await disablePlugin(row.name);
-                toast.success(t("disabled", "Disabled"));
-                refresh();
-              }}
-              title={t("disableTitle", "Disable plugin?")}
-              trigger={
-                <Button size="sm" variant="outline">
-                  <PowerOff />
-                  {t("disable", "Disable")}
-                </Button>
-              }
-            />
-          ),
-          <ConfirmButton
-            cancelText={t("cancel", "Cancel")}
-            confirmText={t("confirm", "Confirm")}
-            description={t(
-              "reloadDescription",
-              "The current WASM instance will be stopped and the plugin will be loaded again from disk."
-            )}
-            key="reload"
-            onConfirm={async () => {
-              await restartPlugin(row.name);
-              toast.success(t("restarted", "Restarted"));
-              refresh();
-            }}
-            title={t("restartTitle", "Restart plugin?")}
-            trigger={
-              <Button
-                disabled={row.status === "unloaded"}
-                size="sm"
-                variant="outline"
-              >
-                <RotateCcw />
-                {t("restart", "Restart")}
-              </Button>
-            }
-          />,
-          <Button
-            key="validate"
-            onClick={async () => {
-              const { data } = await validatePlugin(row.name);
-              if (data.data?.valid) {
-                toast.success(t("validationPassed", "Validation passed"));
-              } else {
-                toast.error(
-                  data.data?.error || t("validationFailed", "Validation failed")
-                );
-              }
-            }}
-            size="sm"
-            variant="outline"
-          >
-            <CheckCircle2 />
-            {t("validate", "Validate")}
-          </Button>,
-        ],
-      }}
-      columns={[
-        {
-          accessorKey: "status",
-          header: t("status", "Status"),
-          cell: ({ row }) => (
-            <Badge variant={statusVariant[row.original.status] || "outline"}>
-              {getStatusLabel(row.original.status)}
-            </Badge>
-          ),
-        },
-        {
-          accessorKey: "name",
-          header: t("name", "Name"),
-          cell: ({ row }) => (
-            <div className="flex min-w-0 flex-col gap-1">
-              <span className="font-medium">{row.original.name}</span>
-              {row.original.description ? (
-                <span className="max-w-[360px] truncate text-muted-foreground text-xs">
-                  {row.original.description}
-                </span>
-              ) : null}
-            </div>
-          ),
-        },
-        {
-          accessorKey: "version",
-          header: t("version", "Version"),
-          cell: ({ row }) => row.original.version || "-",
-        },
-        {
-          accessorKey: "author",
-          header: t("author", "Author"),
-          cell: ({ row }) => row.original.author || "-",
-        },
-        {
-          accessorKey: "permissions",
-          header: t("permissions", "Permissions"),
-          cell: ({ row }) => (
-            <div className="flex max-w-[300px] flex-wrap gap-1">
-              {row.original.permissions?.length ? (
-                row.original.permissions.slice(0, 4).map((item) => (
-                  <Badge key={item} variant="outline">
-                    {item}
+              <CheckCircle2 />
+              {t("validate", "Validate")}
+            </Button>,
+          ],
+        }}
+        columns={[
+          {
+            accessorKey: "status",
+            header: t("status", "Status"),
+            cell: ({ row }) => (
+              <Badge variant={statusVariant[row.original.status] || "outline"}>
+                {getStatusLabel(row.original.status)}
+              </Badge>
+            ),
+          },
+          {
+            accessorKey: "name",
+            header: t("name", "Name"),
+            cell: ({ row }) => (
+              <div className="flex min-w-0 flex-col gap-1">
+                <span className="font-medium">{row.original.name}</span>
+                {row.original.description ? (
+                  <span className="max-w-[360px] truncate text-muted-foreground text-xs">
+                    {row.original.description}
+                  </span>
+                ) : null}
+              </div>
+            ),
+          },
+          {
+            accessorKey: "version",
+            header: t("version", "Version"),
+            cell: ({ row }) => row.original.version || "-",
+          },
+          {
+            accessorKey: "author",
+            header: t("author", "Author"),
+            cell: ({ row }) => row.original.author || "-",
+          },
+          {
+            accessorKey: "permissions",
+            header: t("permissions", "Permissions"),
+            cell: ({ row }) => (
+              <div className="flex max-w-[300px] flex-wrap gap-1">
+                {row.original.permissions?.length ? (
+                  row.original.permissions.slice(0, 4).map((item) => (
+                    <Badge key={item} variant="outline">
+                      {item}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+                {(row.original.permissions?.length || 0) > 4 ? (
+                  <Badge variant="secondary">
+                    +{(row.original.permissions?.length || 0) - 4}
                   </Badge>
-                ))
+                ) : null}
+              </div>
+            ),
+          },
+          {
+            accessorKey: "routes",
+            header: t("routes", "Routes"),
+            cell: ({ row }) => row.original.routes?.length || 0,
+          },
+          {
+            accessorKey: "error",
+            header: t("error", "Error"),
+            cell: ({ row }) =>
+              row.original.error ? (
+                <span className="line-clamp-2 max-w-[320px] text-destructive text-xs">
+                  {row.original.error}
+                </span>
               ) : (
                 <span className="text-muted-foreground">-</span>
-              )}
-              {(row.original.permissions?.length || 0) > 4 ? (
-                <Badge variant="secondary">
-                  +{(row.original.permissions?.length || 0) - 4}
-                </Badge>
-              ) : null}
-            </div>
-          ),
-        },
-        {
-          accessorKey: "routes",
-          header: t("routes", "Routes"),
-          cell: ({ row }) => row.original.routes?.length || 0,
-        },
-        {
-          accessorKey: "error",
-          header: t("error", "Error"),
-          cell: ({ row }) =>
-            row.original.error ? (
-              <span className="line-clamp-2 max-w-[320px] text-destructive text-xs">
-                {row.original.error}
-              </span>
-            ) : (
-              <span className="text-muted-foreground">-</span>
-            ),
-        },
-      ]}
-      header={{
-        title: t("title", "Plugins"),
-        toolbar: (
-          <div className="flex flex-wrap items-center gap-2">
-            <PluginUploadDialog onUploaded={refresh} />
-            <ConfirmButton
-              cancelText={t("cancel", "Cancel")}
-              confirmText={t("confirm", "Confirm")}
-              description={t(
-                "reloadAllDescription",
-                "All running plugin instances will be stopped, the plugin directory will be scanned again, and allowed plugins will be loaded."
-              )}
-              onConfirm={async () => {
-                await reloadAllPlugins();
-                toast.success(t("reloadAllCompleted", "Reloaded plugins"));
-                refresh();
-              }}
-              title={t("reloadAllTitle", "Reload all plugins?")}
-              trigger={
-                <Button variant="outline">
-                  <RotateCcw />
-                  {t("reloadAll", "Reload all")}
-                </Button>
-              }
-            />
-          </div>
-        ),
-      }}
-      params={[
-        {
-          key: "status",
-          placeholder: t("status", "Status"),
-          options: [
-            { label: t("running", "Running"), value: "running" },
-            { label: t("unloaded", "Unloaded"), value: "unloaded" },
-            { label: t("error", "Error"), value: "error" },
-          ],
-        },
-        {
-          key: "q",
-          placeholder: t("search", "Search"),
-        },
-      ]}
-      request={async (pagination, filters) => {
-        const { data } = await getPluginList({
-          page: pagination.page,
-          size: pagination.size,
-          q: filters.q,
-          status: filters.status,
-        });
-        return {
-          list: data.data?.list || [],
-          total: data.data?.total || 0,
-        };
-      }}
-    />
+              ),
+          },
+        ]}
+        params={[
+          {
+            key: "status",
+            placeholder: t("status", "Status"),
+            options: [
+              { label: t("running", "Running"), value: "running" },
+              { label: t("unloaded", "Unloaded"), value: "unloaded" },
+              { label: t("error", "Error"), value: "error" },
+            ],
+          },
+          {
+            key: "q",
+            placeholder: t("search", "Search"),
+          },
+        ]}
+        request={async (pagination, filters) => {
+          const { data } = await getPluginList({
+            page: pagination.page,
+            size: pagination.size,
+            q: filters.q,
+            status: filters.status,
+          });
+          return {
+            list: data.data?.list || [],
+            total: data.data?.total || 0,
+          };
+        }}
+      />
+    </div>
   );
 }
 
@@ -478,7 +494,11 @@ function PluginDetailDialog({ plugin }: { plugin: PluginInfo }) {
   };
 
   return (
-    <Dialog
+    <DetailSheet
+      description={t(
+        "detailDescription",
+        "Manifest, health, routes, middleware, and event subscriptions."
+      )}
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
         if (nextOpen) {
@@ -486,108 +506,99 @@ function PluginDetailDialog({ plugin }: { plugin: PluginInfo }) {
         }
       }}
       open={open}
-    >
-      <DialogTrigger asChild>
+      size="lg"
+      title={plugin.name}
+      trigger={
         <Button size="sm" variant="outline">
           <Eye />
           {t("detail", "Detail")}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[86vh] max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>{plugin.name}</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="max-h-[72vh] pr-4">
-          <div className="grid gap-5">
-            <section className="grid gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant={statusVariant[plugin.status] || "outline"}>
-                  {getStatusLabel(plugin.status)}
-                </Badge>
-                <span className="text-muted-foreground text-sm">
-                  {plugin.version || "-"}
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {plugin.author || "-"}
-                </span>
-              </div>
-              {plugin.error ? (
-                <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-destructive text-sm">
-                  {plugin.error}
-                </div>
-              ) : null}
-            </section>
-
-            <Separator />
-
-            <section className="grid gap-3 md:grid-cols-4">
-              <Metric
-                label={t("ready", "Ready")}
-                value={detail?.health?.ready ? t("yes", "Yes") : t("no", "No")}
-              />
-              <Metric
-                label={t("poolSize", "Pool Size")}
-                value={detail?.health?.pool_size ?? "-"}
-              />
-              <Metric
-                label={t("asyncInflight", "Async In-flight")}
-                value={`${detail?.health?.async_in_flight ?? 0}/${detail?.health?.async_limit ?? 0}`}
-              />
-              <Metric
-                label={t("registeredRoutes", "Registered Routes")}
-                value={detail?.health?.registered_route ?? 0}
-              />
-            </section>
-
-            <Separator />
-
-            <DetailSection title={t("manifest", "Manifest")}>
-              <pre className="max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
-                {JSON.stringify(detail?.manifest || {}, null, 2)}
-              </pre>
-            </DetailSection>
-
-            <DetailSection title={t("runtimeRoutes", "Runtime Routes")}>
-              <RuntimeList
-                emptyText={t("noRoutes", "No runtime routes")}
-                items={detail?.routes.map((item) => ({
-                  key: `${item.Method}:${item.Path}`,
-                  title: `${item.Method} ${item.Path}`,
-                  description: item.Handler,
-                  meta: item.Middleware?.join(", "),
-                }))}
-              />
-            </DetailSection>
-
-            <DetailSection
-              title={t("runtimeMiddlewares", "Runtime Middlewares")}
-            >
-              <RuntimeList
-                emptyText={t("noMiddlewares", "No runtime middlewares")}
-                items={detail?.middlewares.map((item) => ({
-                  key: item.Name,
-                  title: item.Name,
-                  description: item.Handler,
-                }))}
-              />
-            </DetailSection>
-
-            <DetailSection
-              title={t("eventSubscriptions", "Event Subscriptions")}
-            >
-              <RuntimeList
-                emptyText={t("noEvents", "No event subscriptions")}
-                items={detail?.events.map((item) => ({
-                  key: `${item.Event}:${item.Handler}`,
-                  title: item.Event,
-                  description: item.Handler,
-                }))}
-              />
-            </DetailSection>
+      }
+    >
+      <div className="grid gap-5">
+        <section className="grid gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={statusVariant[plugin.status] || "outline"}>
+              {getStatusLabel(plugin.status)}
+            </Badge>
+            <span className="text-muted-foreground text-sm">
+              {plugin.version || "-"}
+            </span>
+            <span className="text-muted-foreground text-sm">
+              {plugin.author || "-"}
+            </span>
           </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+          {plugin.error ? (
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-destructive text-sm">
+              {plugin.error}
+            </div>
+          ) : null}
+        </section>
+
+        <Separator />
+
+        <section className="grid gap-3 md:grid-cols-4">
+          <Metric
+            label={t("ready", "Ready")}
+            value={detail?.health?.ready ? t("yes", "Yes") : t("no", "No")}
+          />
+          <Metric
+            label={t("poolSize", "Pool Size")}
+            value={detail?.health?.pool_size ?? "-"}
+          />
+          <Metric
+            label={t("asyncInflight", "Async In-flight")}
+            value={`${detail?.health?.async_in_flight ?? 0}/${detail?.health?.async_limit ?? 0}`}
+          />
+          <Metric
+            label={t("registeredRoutes", "Registered Routes")}
+            value={detail?.health?.registered_route ?? 0}
+          />
+        </section>
+
+        <Separator />
+
+        <DetailSection title={t("manifest", "Manifest")}>
+          <pre className="max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
+            {JSON.stringify(detail?.manifest || {}, null, 2)}
+          </pre>
+        </DetailSection>
+
+        <DetailSection title={t("runtimeRoutes", "Runtime Routes")}>
+          <RuntimeList
+            emptyText={t("noRoutes", "No runtime routes")}
+            items={detail?.routes.map((item) => ({
+              key: `${item.Method}:${item.Path}`,
+              title: `${item.Method} ${item.Path}`,
+              description: item.Handler,
+              meta: item.Middleware?.join(", "),
+            }))}
+          />
+        </DetailSection>
+
+        <DetailSection title={t("runtimeMiddlewares", "Runtime Middlewares")}>
+          <RuntimeList
+            emptyText={t("noMiddlewares", "No runtime middlewares")}
+            items={detail?.middlewares.map((item) => ({
+              key: item.Name,
+              title: item.Name,
+              description: item.Handler,
+            }))}
+          />
+        </DetailSection>
+
+        <DetailSection title={t("eventSubscriptions", "Event Subscriptions")}>
+          <RuntimeList
+            emptyText={t("noEvents", "No event subscriptions")}
+            items={detail?.events.map((item) => ({
+              key: `${item.Event}:${item.Handler}`,
+              title: item.Event,
+              description: item.Handler,
+            }))}
+          />
+        </DetailSection>
+      </div>
+    </DetailSheet>
   );
 }
 

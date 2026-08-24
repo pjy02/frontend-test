@@ -21,11 +21,16 @@ import {
 } from "@workspace/ui/components/sheet";
 import { Switch } from "@workspace/ui/components/switch";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
 import {
   getAuthMethodConfig,
   updateAuthMethodConfig,
 } from "@workspace/ui/services/admin/authMethod";
+import {
+  ChevronRight,
+  Dices,
+  LoaderCircle,
+  MonitorSmartphone,
+} from "lucide-react";
 import { uid } from "radash";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -112,7 +117,7 @@ export default function DeviceForm() {
         <div className="flex cursor-pointer items-center justify-between transition-colors">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" icon="mdi:devices" />
+              <MonitorSmartphone className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
               <p className="font-medium">
@@ -123,7 +128,7 @@ export default function DeviceForm() {
               </p>
             </div>
           </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
+          <ChevronRight className="size-5 text-muted-foreground" />
         </div>
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
@@ -251,9 +256,8 @@ export default function DeviceForm() {
                         placeholder="e.g., 12345678-1234-1234-1234-123456789abc"
                         suffix={
                           <div className="flex h-9 items-center text-nowrap bg-muted px-3">
-                            <Icon
+                            <Dices
                               className="size-4 cursor-pointer"
-                              icon="mdi:dice-multiple"
                               onClick={generateSecurityKey}
                             />
                           </div>
@@ -283,9 +287,7 @@ export default function DeviceForm() {
             {t("common.cancel", "Cancel")}
           </Button>
           <Button disabled={loading} form="device-form" type="submit">
-            {loading && (
-              <Icon className="mr-2 animate-spin" icon="mdi:loading" />
-            )}
+            {loading && <LoaderCircle className="mr-2 animate-spin" />}
             {t("common.save", "Save")}
           </Button>
         </SheetFooter>

@@ -11,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
   SelectContent,
@@ -19,14 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
 import { Switch } from "@workspace/ui/components/switch";
 import {
   Tabs,
@@ -35,12 +26,14 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { ArrayInput } from "@workspace/ui/composed/dynamic-Inputs";
-import { Icon } from "@workspace/ui/composed/icon";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import {
   getServerNodeConfig,
   updateServerNodeConfig,
 } from "@workspace/ui/services/admin/server";
+import { LoaderCircle, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Control, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -197,283 +190,13 @@ export default function ServerNodeConfig({ server }: { server: API.Server }) {
   }
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
-        <Button variant="outline">
-          <Icon className="mr-2 h-4 w-4" icon="mdi:tune-variant" />
-          {t("server_node_config.trigger", "Node Config")}
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-[700px] max-w-full gap-0 md:max-w-3xl">
-        <SheetHeader>
-          <SheetTitle>
-            {t("server_node_config.title", "Node Config")} - {server.name}
-          </SheetTitle>
-        </SheetHeader>
-
-        <ScrollArea className="h-[calc(100vh-8rem)] pr-3">
-          {isError && (
-            <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
-              {t(
-                "server_node_config.loadError",
-                "Failed to load node config. Please close and try again."
-              )}
-            </div>
-          )}
-          <Tabs className="mt-4" defaultValue="dns">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="dns">
-                {t("server_config.tabs.dns", "DNS Configuration")}
-              </TabsTrigger>
-              <TabsTrigger value="outbound">
-                {t("server_config.tabs.outbound", "Outbound Rules")}
-              </TabsTrigger>
-              <TabsTrigger value="block">
-                {t("server_config.tabs.block", "Block Rules")}
-              </TabsTrigger>
-            </TabsList>
-
-            <Form {...form}>
-              <form
-                className="space-y-4 pt-4"
-                id="server-node-config-form"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <TabsContent className="space-y-4" value="dns">
-                  <ToggleField
-                    control={form.control}
-                    label={t(
-                      "server_node_config.inherit_ip_strategy",
-                      "Inherit global IP strategy"
-                    )}
-                    name="inherit_ip_strategy"
-                  />
-                  <div
-                    className={
-                      inheritIPStrategy ? "pointer-events-none opacity-50" : ""
-                    }
-                  >
-                    <FormField
-                      control={form.control}
-                      name="ip_strategy"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t(
-                              "server_config.fields.ip_strategy",
-                              "IP Strategy"
-                            )}
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue
-                                  placeholder={t(
-                                    "server_config.fields.ip_strategy_placeholder",
-                                    "Select IP strategy"
-                                  )}
-                                />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="prefer_ipv4">
-                                {t(
-                                  "server_config.fields.ip_strategy_ipv4",
-                                  "Prefer IPv4"
-                                )}
-                              </SelectItem>
-                              <SelectItem value="prefer_ipv6">
-                                {t(
-                                  "server_config.fields.ip_strategy_ipv6",
-                                  "Prefer IPv6"
-                                )}
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <ToggleField
-                    control={form.control}
-                    label={t(
-                      "server_node_config.inherit_dns",
-                      "Inherit global DNS"
-                    )}
-                    name="inherit_dns"
-                  />
-                  <div
-                    className={
-                      inheritDNS ? "pointer-events-none opacity-50" : ""
-                    }
-                  >
-                    <FormField
-                      control={form.control}
-                      name="dns"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t(
-                              "server_config.fields.dns_config",
-                              "DNS Configuration"
-                            )}
-                          </FormLabel>
-                          <FormControl>
-                            <ArrayInput
-                              className="grid grid-cols-2 gap-2"
-                              fields={[
-                                {
-                                  name: "proto",
-                                  type: "select",
-                                  placeholder: t(
-                                    "server_config.fields.dns_proto_placeholder",
-                                    "Select type"
-                                  ),
-                                  options: [
-                                    { label: "TCP", value: "tcp" },
-                                    { label: "UDP", value: "udp" },
-                                    { label: "TLS", value: "tls" },
-                                    { label: "HTTPS", value: "https" },
-                                    { label: "QUIC", value: "quic" },
-                                  ],
-                                },
-                                {
-                                  name: "address",
-                                  type: "text",
-                                  placeholder: "8.8.8.8:53",
-                                },
-                                {
-                                  name: "server_name",
-                                  type: "text",
-                                  placeholder: t(
-                                    "server_config.fields.dns_server_name_placeholder",
-                                    "TLS server name (optional)"
-                                  ),
-                                },
-                                {
-                                  name: "domains",
-                                  type: "textarea",
-                                  className: "col-span-2",
-                                  placeholder: t(
-                                    "server_config.fields.dns_domains_placeholder",
-                                    "One domain rule per line"
-                                  ),
-                                },
-                              ]}
-                              onChange={(values) => {
-                                const converted = values.map((item: any) => ({
-                                  proto: item.proto,
-                                  address: item.address,
-                                  server_name: item.server_name || "",
-                                  domains:
-                                    typeof item.domains === "string"
-                                      ? splitLines(item.domains)
-                                      : item.domains || [],
-                                }));
-                                field.onChange(converted);
-                              }}
-                              value={(field.value || []).map((item) => ({
-                                ...item,
-                                domains: Array.isArray(item.domains)
-                                  ? item.domains.join("\n")
-                                  : "",
-                              }))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent className="space-y-4" value="outbound">
-                  <ToggleField
-                    control={form.control}
-                    label={t(
-                      "server_node_config.inherit_outbound",
-                      "Inherit global outbound"
-                    )}
-                    name="inherit_outbound"
-                  />
-                  <div
-                    className={
-                      inheritOutbound ? "pointer-events-none opacity-50" : ""
-                    }
-                  >
-                    <FormField
-                      control={form.control}
-                      name="outbound"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <OutboundConfigInput
-                              onChange={(values) => {
-                                field.onChange(
-                                  values.map((item) =>
-                                    normalizeOutboundConfig(item)
-                                  )
-                                );
-                              }}
-                              value={field.value || []}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent className="space-y-4" value="block">
-                  <ToggleField
-                    control={form.control}
-                    label={t(
-                      "server_node_config.inherit_block",
-                      "Inherit global block rules"
-                    )}
-                    name="inherit_block"
-                  />
-                  <div
-                    className={
-                      inheritBlock ? "pointer-events-none opacity-50" : ""
-                    }
-                  >
-                    <FormField
-                      control={form.control}
-                      name="block"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Textarea
-                              onChange={(e) => {
-                                field.onChange(splitLines(e.target.value));
-                              }}
-                              placeholder={t(
-                                "server_config.fields.block_rules_placeholder",
-                                "One domain rule per line"
-                              )}
-                              rows={10}
-                              value={(field.value || []).join("\n")}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </TabsContent>
-              </form>
-            </Form>
-          </Tabs>
-        </ScrollArea>
-
-        <SheetFooter className="flex-row justify-end gap-2 pt-3">
+    <DetailSheet
+      description={t(
+        "server_node_config.description",
+        "Override inherited IP strategy, DNS, outbound, and block rules for this server."
+      )}
+      footer={
+        <StickyActions>
           <Button
             disabled={saving}
             onClick={() => setOpen(false)}
@@ -486,14 +209,274 @@ export default function ServerNodeConfig({ server }: { server: API.Server }) {
             form="server-node-config-form"
             type="submit"
           >
-            <Icon
-              className={saving ? "mr-2 animate-spin" : "hidden"}
-              icon="mdi:loading"
-            />
+            {saving && <LoaderCircle className="mr-2 animate-spin" />}
             {t("actions.save", "Save")}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="lg"
+      title={`${t("server_node_config.title", "Node Config")} - ${server.name}`}
+      trigger={
+        <Button variant="outline">
+          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          {t("server_node_config.trigger", "Node Config")}
+        </Button>
+      }
+    >
+      {isError && (
+        <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
+          {t(
+            "server_node_config.loadError",
+            "Failed to load node config. Please close and try again."
+          )}
+        </div>
+      )}
+      <Tabs className="mt-4" defaultValue="dns">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="dns">
+            {t("server_config.tabs.dns", "DNS Configuration")}
+          </TabsTrigger>
+          <TabsTrigger value="outbound">
+            {t("server_config.tabs.outbound", "Outbound Rules")}
+          </TabsTrigger>
+          <TabsTrigger value="block">
+            {t("server_config.tabs.block", "Block Rules")}
+          </TabsTrigger>
+        </TabsList>
+
+        <Form {...form}>
+          <form
+            className="space-y-4 pt-4"
+            id="server-node-config-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <TabsContent className="space-y-4" value="dns">
+              <ToggleField
+                control={form.control}
+                label={t(
+                  "server_node_config.inherit_ip_strategy",
+                  "Inherit global IP strategy"
+                )}
+                name="inherit_ip_strategy"
+              />
+              <div
+                className={
+                  inheritIPStrategy ? "pointer-events-none opacity-50" : ""
+                }
+              >
+                <FormField
+                  control={form.control}
+                  name="ip_strategy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("server_config.fields.ip_strategy", "IP Strategy")}
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t(
+                                "server_config.fields.ip_strategy_placeholder",
+                                "Select IP strategy"
+                              )}
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="prefer_ipv4">
+                            {t(
+                              "server_config.fields.ip_strategy_ipv4",
+                              "Prefer IPv4"
+                            )}
+                          </SelectItem>
+                          <SelectItem value="prefer_ipv6">
+                            {t(
+                              "server_config.fields.ip_strategy_ipv6",
+                              "Prefer IPv6"
+                            )}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <ToggleField
+                control={form.control}
+                label={t(
+                  "server_node_config.inherit_dns",
+                  "Inherit global DNS"
+                )}
+                name="inherit_dns"
+              />
+              <div
+                className={inheritDNS ? "pointer-events-none opacity-50" : ""}
+              >
+                <FormField
+                  control={form.control}
+                  name="dns"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t(
+                          "server_config.fields.dns_config",
+                          "DNS Configuration"
+                        )}
+                      </FormLabel>
+                      <FormControl>
+                        <ArrayInput
+                          className="grid grid-cols-2 gap-2"
+                          fields={[
+                            {
+                              name: "proto",
+                              type: "select",
+                              placeholder: t(
+                                "server_config.fields.dns_proto_placeholder",
+                                "Select type"
+                              ),
+                              options: [
+                                { label: "TCP", value: "tcp" },
+                                { label: "UDP", value: "udp" },
+                                { label: "TLS", value: "tls" },
+                                { label: "HTTPS", value: "https" },
+                                { label: "QUIC", value: "quic" },
+                              ],
+                            },
+                            {
+                              name: "address",
+                              type: "text",
+                              placeholder: "8.8.8.8:53",
+                            },
+                            {
+                              name: "server_name",
+                              type: "text",
+                              placeholder: t(
+                                "server_config.fields.dns_server_name_placeholder",
+                                "TLS server name (optional)"
+                              ),
+                            },
+                            {
+                              name: "domains",
+                              type: "textarea",
+                              className: "col-span-2",
+                              placeholder: t(
+                                "server_config.fields.dns_domains_placeholder",
+                                "One domain rule per line"
+                              ),
+                            },
+                          ]}
+                          onChange={(values) => {
+                            const converted = values.map((item: any) => ({
+                              proto: item.proto,
+                              address: item.address,
+                              server_name: item.server_name || "",
+                              domains:
+                                typeof item.domains === "string"
+                                  ? splitLines(item.domains)
+                                  : item.domains || [],
+                            }));
+                            field.onChange(converted);
+                          }}
+                          value={(field.value || []).map((item) => ({
+                            ...item,
+                            domains: Array.isArray(item.domains)
+                              ? item.domains.join("\n")
+                              : "",
+                          }))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent className="space-y-4" value="outbound">
+              <ToggleField
+                control={form.control}
+                label={t(
+                  "server_node_config.inherit_outbound",
+                  "Inherit global outbound"
+                )}
+                name="inherit_outbound"
+              />
+              <div
+                className={
+                  inheritOutbound ? "pointer-events-none opacity-50" : ""
+                }
+              >
+                <FormField
+                  control={form.control}
+                  name="outbound"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <OutboundConfigInput
+                          onChange={(values) => {
+                            field.onChange(
+                              values.map((item) =>
+                                normalizeOutboundConfig(item)
+                              )
+                            );
+                          }}
+                          value={field.value || []}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent className="space-y-4" value="block">
+              <ToggleField
+                control={form.control}
+                label={t(
+                  "server_node_config.inherit_block",
+                  "Inherit global block rules"
+                )}
+                name="inherit_block"
+              />
+              <div
+                className={inheritBlock ? "pointer-events-none opacity-50" : ""}
+              >
+                <FormField
+                  control={form.control}
+                  name="block"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          onChange={(e) => {
+                            field.onChange(splitLines(e.target.value));
+                          }}
+                          placeholder={t(
+                            "server_config.fields.block_rules_placeholder",
+                            "One domain rule per line"
+                          )}
+                          rows={10}
+                          value={(field.value || []).join("\n")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </TabsContent>
+          </form>
+        </Form>
+      </Tabs>
+    </DetailSheet>
   );
 }

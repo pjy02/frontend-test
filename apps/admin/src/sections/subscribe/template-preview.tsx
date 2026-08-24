@@ -2,16 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { MonacoEditor } from "@workspace/ui/composed/editor/monaco-editor";
-import { Icon } from "@workspace/ui/composed/icon";
 import { previewSubscribeTemplate } from "@workspace/ui/services/admin/application";
+import { Eye, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -85,34 +79,39 @@ export function TemplatePreview({
   };
 
   return (
-    <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger asChild>
+    <DetailSheet
+      bodyClassName="flex min-h-0 flex-col"
+      description={t(
+        "templatePreview.description",
+        "Inspect the rendered output before distributing it to clients."
+      )}
+      onOpenChange={setIsOpen}
+      open={isOpen}
+      size="lg"
+      title={t("templatePreview.title", "Template Preview")}
+      trigger={
         <Button variant="ghost">
-          <Icon className="h-4 w-4" icon="mdi:eye" />
+          <Eye className="h-4 w-4" />
           {t("templatePreview.preview", "Preview")}
         </Button>
-      </SheetTrigger>
-      <SheetHeader>
-        <SheetTitle />
-      </SheetHeader>
-      <SheetContent className="w-[800px] max-w-[90vw] pt-10 md:max-w-screen-md">
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <Icon className="h-6 w-6 animate-spin" icon="mdi:loading" />
-            <span className="ml-2">
-              {t("templatePreview.loading", "Loading...")}
-            </span>
-          </div>
-        ) : (
-          <MonacoEditor
-            language={mapLanguage(output_format)}
-            readOnly
-            showLineNumbers
-            title={t("templatePreview.title", "Template Preview")}
-            value={getDisplayContent()}
-          />
-        )}
-      </SheetContent>
-    </Sheet>
+      }
+    >
+      {isLoading ? (
+        <div className="flex items-center justify-center">
+          <LoaderCircle className="h-6 w-6 animate-spin" />
+          <span className="ml-2">
+            {t("templatePreview.loading", "Loading...")}
+          </span>
+        </div>
+      ) : (
+        <MonacoEditor
+          language={mapLanguage(output_format)}
+          readOnly
+          showLineNumbers
+          title={t("templatePreview.title", "Template Preview")}
+          value={getDisplayContent()}
+        />
+      )}
+    </DetailSheet>
   );
 }

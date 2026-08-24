@@ -3,10 +3,12 @@
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { ConfirmButton } from "@workspace/ui/composed/confirm-button";
+import { PageHeader } from "@workspace/ui/composed/page-header";
 import {
   ProTable,
   type ProTableActions,
 } from "@workspace/ui/composed/pro-table/pro-table";
+import { StatusBadge } from "@workspace/ui/composed/status-badge";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   createServer,
@@ -90,8 +92,44 @@ export default function Servers() {
   const [loading, setLoading] = useState(false);
   const ref = useRef<ProTableActions>(null);
 
+  const createAction = (
+    <ServerForm
+      loading={loading}
+      onSubmit={async (values) => {
+        setLoading(true);
+        try {
+          await createServer(values as unknown as API.CreateServerRequest);
+          toast.success(t("created", "Created"));
+          ref.current?.refresh();
+          fetchServers();
+          setLoading(false);
+          return true;
+        } catch {
+          setLoading(false);
+          return false;
+        }
+      }}
+      title={t("drawerCreateTitle", "Create Server")}
+      trigger={t("create", "Create")}
+    />
+  );
+
   return (
-    <div className="space-y-4">
+    <div className="grid gap-5">
+      <PageHeader
+        actions={createAction}
+        description={t(
+          "pageDescription",
+          "Monitor edge capacity, protocol listeners, and node-level runtime configuration."
+        )}
+        eyebrow={t("pageEyebrow", "Infrastructure")}
+        metadata={
+          <StatusBadge tone="info">
+            {t("runtimeTelemetry", "Live runtime telemetry")}
+          </StatusBadge>
+        }
+        title={t("pageTitle", "Servers")}
+      />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <DynamicMultiplier />
         <ServerConfig />
@@ -339,34 +377,6 @@ export default function Servers() {
             ),
           },
         ]}
-        header={{
-          title: t("pageTitle", "Servers"),
-          toolbar: (
-            <div className="flex gap-2">
-              <ServerForm
-                loading={loading}
-                onSubmit={async (values) => {
-                  setLoading(true);
-                  try {
-                    await createServer(
-                      values as unknown as API.CreateServerRequest
-                    );
-                    toast.success(t("created", "Created"));
-                    ref.current?.refresh();
-                    fetchServers();
-                    setLoading(false);
-                    return true;
-                  } catch {
-                    setLoading(false);
-                    return false;
-                  }
-                }}
-                title={t("drawerCreateTitle", "Create Server")}
-                trigger={t("create", "Create")}
-              />
-            </div>
-          ),
-        }}
         onSort={async (source, target, items) => {
           const sourceIndex = items.findIndex(
             (item) => String(item.id) === source

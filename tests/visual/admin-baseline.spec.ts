@@ -195,7 +195,91 @@ const visualSubscribe = {
   name: "Pro Annual",
   description: "Primary annual subscription",
   unit_price: 19_900,
-  currency: "USD",
+  unit_time: "Month",
+  discount: [{ quantity: 12, discount: 15 }],
+  replacement: 0,
+  inventory: -1,
+  traffic: 1_099_511_627_776,
+  speed_limit: 0,
+  device_limit: 5,
+  quota: 0,
+  nodes: [21],
+  node_tags: ["premium"],
+  show: true,
+  sell: true,
+  sort: 1,
+  deduction_ratio: 0,
+  allow_deduction: false,
+  reset_cycle: 1,
+  renewal_reset: true,
+  show_original_price: true,
+  sold: 384,
+  language: "zh-CN",
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_601_600_000,
+};
+
+const visualServer = {
+  id: 1,
+  name: "Hong Kong Edge 01",
+  country: "Hong Kong",
+  city: "Central",
+  address: "203.0.113.10",
+  sort: 1,
+  protocols: [
+    { type: "vless", port: 443, enable: true, ratio: 1 },
+    { type: "shadowsocks", port: 8443, enable: true, ratio: 1.2 },
+  ],
+  last_reported_at: 1_724_605_200_000,
+  status: {
+    cpu: 28.4,
+    mem: 46.8,
+    disk: 61.2,
+    protocol: "vless",
+    online: [],
+    status: "online",
+  },
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_605_200_000,
+};
+
+const visualNode = {
+  id: 21,
+  name: "HK Premium Gateway",
+  tags: ["premium", "asia"],
+  port: 443,
+  address: "hk-edge.example.com",
+  server_id: 1,
+  protocol: "vless",
+  enabled: true,
+  sort: 1,
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_605_200_000,
+};
+
+const visualApplication = {
+  id: 31,
+  name: "Clash Meta",
+  description: "Managed profile for Clash-compatible clients",
+  icon: "",
+  scheme: "clash://install-config?url={{url}}",
+  user_agent: "Clash|Mihomo",
+  is_default: true,
+  template: "proxies: {{ .Proxies }}",
+  output_format: "yaml",
+  download_link: { windows: "https://example.com/clash" },
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_605_200_000,
+};
+
+const visualPlugin = {
+  name: "traffic-insights",
+  version: "1.4.2",
+  description: "Adds operational traffic insights and health endpoints.",
+  author: "PPanel Labs",
+  status: "running",
+  permissions: ["http.route", "event.subscribe", "storage.read"],
+  routes: ["GET /admin/traffic-insights"],
 };
 
 const visualOrder = {
@@ -372,6 +456,101 @@ function responseFor(url: URL) {
     return { count: 1, list: [visualUser], total: 1 };
   }
   if (url.pathname.endsWith("/v1/admin/user/detail")) return visualUser;
+  if (url.pathname.endsWith("/v1/admin/server/list")) {
+    return { count: 1, list: [visualServer], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/server/node/list")) {
+    return { count: 1, list: [visualNode], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/server/node/tags")) {
+    return { tags: ["premium", "asia"] };
+  }
+  if (
+    url.pathname.endsWith("/v1/admin/application/subscribe_application_list")
+  ) {
+    return { count: 1, list: [visualApplication], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/application/preview")) {
+    return { template: "proxies:\n  - name: HK Premium Gateway" };
+  }
+  if (url.pathname.endsWith("/v1/admin/system/subscribe_config")) {
+    return globalConfig.subscribe;
+  }
+  if (url.pathname.endsWith("/v1/admin/auth-method/config")) {
+    return {
+      id: 1,
+      method: url.searchParams.get("method") || "email",
+      enabled: true,
+      config: {
+        enable_verify: true,
+        enable_domain_suffix: false,
+        domain_suffix_list: "",
+        platform: "smtp",
+        platform_config: {
+          host: "smtp.example.com",
+          port: 587,
+          ssl: false,
+          user: "mailer@example.com",
+          pass: "",
+          from: "PPanel <mailer@example.com>",
+          reply_to: "support@example.com",
+        },
+      },
+    };
+  }
+  if (url.pathname === "/v1/admin/plugins") {
+    return { list: [visualPlugin], total: 1 };
+  }
+  if (url.pathname.endsWith("/traffic-insights/manifest")) {
+    return {
+      name: visualPlugin.name,
+      version: visualPlugin.version,
+      description: visualPlugin.description,
+      author: visualPlugin.author,
+      main: "traffic-insights.wasm",
+      permissions: visualPlugin.permissions,
+    };
+  }
+  if (url.pathname.endsWith("/traffic-insights/health")) {
+    return {
+      name: visualPlugin.name,
+      status: "running",
+      ready: true,
+      pool_size: 4,
+      async_in_flight: 1,
+      async_limit: 32,
+      registered_route: 1,
+    };
+  }
+  if (url.pathname.endsWith("/traffic-insights/routes")) {
+    return [
+      {
+        PluginName: visualPlugin.name,
+        Method: "GET",
+        Path: "/admin/traffic-insights",
+        Handler: "handleInsights",
+        Middleware: ["admin-auth"],
+      },
+    ];
+  }
+  if (url.pathname.endsWith("/traffic-insights/middlewares")) {
+    return [
+      {
+        PluginName: visualPlugin.name,
+        Name: "admin-auth",
+        Handler: "requireAdmin",
+      },
+    ];
+  }
+  if (url.pathname.endsWith("/traffic-insights/events")) {
+    return [
+      {
+        PluginName: visualPlugin.name,
+        Event: "server.traffic.reported",
+        Handler: "recordTraffic",
+      },
+    ];
+  }
   if (url.pathname.endsWith("/v1/admin/subscribe/list")) {
     return { count: 1, list: [visualSubscribe], total: 1 };
   }
@@ -630,6 +809,117 @@ test.describe("admin phase 0 visual baseline", () => {
     ).toBeVisible();
     await stabilizeVisuals(page);
     await expect(page).toHaveScreenshot("payment-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("server workspace and protocol editor", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/servers");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "服务器" })
+    ).toBeVisible();
+    await expect(page.getByText("Hong Kong Edge 01")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "创建服务器" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("server-protocol-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("node workspace and endpoint editor", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/nodes");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "节点" })
+    ).toBeVisible();
+    await expect(page.getByText("HK Premium Gateway")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    await expect(page.getByRole("dialog", { name: "创建节点" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("node-endpoint-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("subscription delivery workspace and client editor", async ({
+    page,
+  }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/subscribe");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "订阅配置" })
+    ).toBeVisible();
+    await expect(page.getByText("Clash Meta")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "添加" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "添加客户端" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("subscription-client-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("product composition workspace and plan editor", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/product");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "商品管理" })
+    ).toBeVisible();
+    await expect(page.getByText("Pro Annual")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    await expect(page.getByRole("dialog", { name: "创建订阅" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("product-composition-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("authentication workspace and channel configuration", async ({
+    page,
+  }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/auth-control");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "认证方式" })
+    ).toBeVisible();
+    await page.getByText("邮箱设置", { exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "邮箱设置" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("authentication-channel-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("plugin lifecycle workspace and runtime detail", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/plugin");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "插件" })
+    ).toBeVisible();
+    await expect(page.getByText("traffic-insights")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "详情" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "traffic-insights" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("plugin-runtime-sheet.png", {
       animations: "disabled",
       fullPage: false,
     });

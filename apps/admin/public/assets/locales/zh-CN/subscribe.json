@@ -1,4 +1,8 @@
 {
+  "pageTitle": "订阅配置",
+  "pageDescription": "管理订阅投递、客户端匹配、模板与下载行为。",
+  "pageEyebrow": "投递平台",
+  "templateDriven": "模板驱动输出",
   "actions": {
     "add": "添加",
     "batchDelete": "批量删除",

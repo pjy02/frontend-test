@@ -31,7 +31,6 @@ import { Switch } from "@workspace/ui/components/switch";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { AreaCodeSelect } from "@workspace/ui/composed/area-code-select";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
 import TagInput from "@workspace/ui/composed/tag-input";
 import {
   getAuthMethodConfig,
@@ -39,6 +38,7 @@ import {
   testSmsSend,
   updateAuthMethodConfig,
 } from "@workspace/ui/services/admin/authMethod";
+import { ChevronRight, LoaderCircle, MessageSquareText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -155,10 +155,7 @@ export default function PhoneSettingsForm() {
         <div className="flex cursor-pointer items-center justify-between transition-colors">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon
-                className="h-5 w-5 text-primary"
-                icon="mdi:phone-settings"
-              />
+              <MessageSquareText className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
               <p className="font-medium">{t("phone.title", "SMS Settings")}</p>
@@ -167,7 +164,7 @@ export default function PhoneSettingsForm() {
               </p>
             </div>
           </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
+          <ChevronRight className="size-5 text-muted-foreground" />
         </div>
       </SheetTrigger>
       <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
@@ -610,9 +607,7 @@ export default function PhoneSettingsForm() {
             {t("common.cancel", "Cancel")}
           </Button>
           <Button disabled={loading} form="phone-settings-form" type="submit">
-            {loading && (
-              <Icon className="mr-2 animate-spin" icon="mdi:loading" />
-            )}
+            {loading && <LoaderCircle className="mr-2 animate-spin" />}
             {t("common.save", "Save")}
           </Button>
         </SheetFooter>

@@ -1,4 +1,8 @@
 {
+  "pageTitle": "商品管理",
+  "pageDescription": "组合价格、限制、库存与可用服务器，构建订阅商品。",
+  "pageEyebrow": "商品目录",
+  "draftByDefault": "新商品默认草稿",
   "cancel": "取消",
   "confirm": "确认",
   "confirmDelete": "确定要删除吗？",
@@ -15,6 +19,8 @@
   "editSubscribe": "编辑订阅",
   "sortSuccess": "排序成功",
   "form": {
+    "editorDescription": "配置商品展示、计费规则、额度与可用基础设施。",
+    "saveDescription": "新商品默认隐藏且不可销售，需明确启用后才会发布。",
     "annualReset": "年度重置",
     "basic": "基本",
     "cancel": "取消",

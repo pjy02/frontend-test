@@ -23,7 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
   SelectContent,
@@ -31,18 +30,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
 import { Switch } from "@workspace/ui/components/switch";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import { cn } from "@workspace/ui/lib/utils";
+import { KeyRound, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Resolver, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -169,7 +162,7 @@ function DynamicField({
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button size="sm" type="button" variant="ghost">
-                              <Icon className="h-4 w-4" icon="mdi:key" />
+                              <KeyRound className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -226,7 +219,7 @@ function DynamicField({
                           type="button"
                           variant="ghost"
                         >
-                          <Icon className="h-4 w-4" icon="mdi:key" />
+                          <KeyRound className="h-4 w-4" />
                         </Button>
                       ) : null
                     ) : (
@@ -744,8 +737,43 @@ export default function ServerForm(props: {
   }
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
+    <DetailSheet
+      description={t(
+        "formDescription",
+        "Define the server address and one or more protocol listeners with their transport and security settings."
+      )}
+      footer={
+        <StickyActions
+          description={t(
+            "saveDescription",
+            "Protocol changes are applied when the server receives its next configuration."
+          )}
+        >
+          <Button
+            disabled={loading}
+            onClick={() => setOpen(false)}
+            variant="outline"
+          >
+            {t("cancel", "Cancel")}
+          </Button>
+          <Button
+            disabled={loading}
+            onClick={form.handleSubmit(handleSubmit, (errors) => {
+              const key = Object.keys(errors)[0] as keyof typeof errors;
+              if (key) toast.error(String(errors[key]?.message));
+              return false;
+            })}
+          >
+            {loading && <LoaderCircle className="mr-2 animate-spin" />}
+            {t("confirm", "Confirm")}
+          </Button>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="lg"
+      title={title}
+      trigger={
         <Button
           onClick={() => {
             if (!initialValues) {
@@ -763,271 +791,232 @@ export default function ServerForm(props: {
         >
           {trigger}
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-[700px] max-w-full gap-0 md:max-w-3xl">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))]">
-          <Form {...form}>
-            <form className="grid grid-cols-1 gap-2 px-6 pt-4">
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                <FormField
-                  control={control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("name", "Name")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          onValueChange={(v) => field.onChange(v)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("address", "Address")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          onValueChange={(v) => field.onChange(v)}
-                          placeholder={t(
-                            "address_placeholder",
-                            "Server address"
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("country", "Country")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          onValueChange={(v) => field.onChange(v)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("city", "City")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          onValueChange={(v) => field.onChange(v)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="my-3">
-                <h3 className="font-semibold text-foreground text-sm">
-                  {t("protocol_configurations", "Protocol Configurations")}
-                </h3>
-                <p className="mt-1 text-muted-foreground text-xs">
-                  {t(
-                    "protocol_configurations_desc",
-                    "Enable and configure the required protocol types"
-                  )}
-                </p>
-              </div>
+      }
+    >
+      <Form {...form}>
+        <form className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            <FormField
+              control={control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("name", "Name")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      {...field}
+                      onValueChange={(v) => field.onChange(v)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("address", "Address")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      {...field}
+                      onValueChange={(v) => field.onChange(v)}
+                      placeholder={t("address_placeholder", "Server address")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("country", "Country")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      {...field}
+                      onValueChange={(v) => field.onChange(v)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("city", "City")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      {...field}
+                      onValueChange={(v) => field.onChange(v)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="my-3">
+            <h3 className="font-semibold text-foreground text-sm">
+              {t("protocol_configurations", "Protocol Configurations")}
+            </h3>
+            <p className="mt-1 text-muted-foreground text-xs">
+              {t(
+                "protocol_configurations_desc",
+                "Enable and configure the required protocol types"
+              )}
+            </p>
+          </div>
 
-              <Accordion
-                className="w-full space-y-3"
-                collapsible
-                onValueChange={setAccordionValue}
-                type="single"
-                value={accordionValue}
-              >
-                {PROTOCOLS.map((type) => {
-                  const i = Math.max(0, PROTOCOLS.indexOf(type));
-                  const current = (protocolsValues[i] || {}) as Record<
-                    string,
-                    any
-                  >;
-                  const isEnabled = current?.enable;
-                  const fields = PROTOCOL_FIELDS[type] || [];
-                  return (
-                    <AccordionItem
-                      className="mb-2 rounded-lg border"
-                      key={type}
-                      value={type}
-                    >
-                      <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                        <div className="flex w-full items-center justify-between">
-                          <div className="flex flex-col items-start gap-1">
-                            <div className="flex items-center gap-1">
-                              <span className="font-medium capitalize">
-                                {type}
-                              </span>
-                              {current.transport && (
-                                <Badge className="text-xs" variant="secondary">
-                                  {current.transport.toUpperCase()}
-                                </Badge>
-                              )}
-                              {current.security &&
-                                current.security !== "none" && (
-                                  <Badge className="text-xs" variant="outline">
-                                    {current.security.toUpperCase()}
-                                  </Badge>
-                                )}
-                              {current.port && (
-                                <Badge className="text-xs">
-                                  {current.port}
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span
-                                className={cn(
-                                  "text-xs",
-                                  isEnabled
-                                    ? "text-green-500"
-                                    : "text-muted-foreground"
-                                )}
-                              >
-                                {isEnabled
-                                  ? t("enabled", "Enabled")
-                                  : t("disabled", "Disabled")}
-                              </span>
-                            </div>
-                          </div>
-                          <Switch
-                            checked={!!isEnabled}
-                            className="mr-2"
-                            disabled={Boolean(
-                              initialValues?.id &&
-                                isProtocolUsedInNodes(
-                                  initialValues?.id || 0,
-                                  type
-                                ) &&
-                                isEnabled
+          <Accordion
+            className="w-full space-y-3"
+            collapsible
+            onValueChange={setAccordionValue}
+            type="single"
+            value={accordionValue}
+          >
+            {PROTOCOLS.map((type) => {
+              const i = Math.max(0, PROTOCOLS.indexOf(type));
+              const current = (protocolsValues[i] || {}) as Record<string, any>;
+              const isEnabled = current?.enable;
+              const fields = PROTOCOL_FIELDS[type] || [];
+              return (
+                <AccordionItem
+                  className="mb-2 rounded-lg border"
+                  key={type}
+                  value={type}
+                >
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex flex-col items-start gap-1">
+                        <div className="flex items-center gap-1">
+                          <span className="font-medium capitalize">{type}</span>
+                          {current.transport && (
+                            <Badge className="text-xs" variant="secondary">
+                              {current.transport.toUpperCase()}
+                            </Badge>
+                          )}
+                          {current.security && current.security !== "none" && (
+                            <Badge className="text-xs" variant="outline">
+                              {current.security.toUpperCase()}
+                            </Badge>
+                          )}
+                          {current.port && (
+                            <Badge className="text-xs">{current.port}</Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={cn(
+                              "text-xs",
+                              isEnabled
+                                ? "text-green-500"
+                                : "text-muted-foreground"
                             )}
-                            onCheckedChange={(checked) => {
-                              form.setValue(`protocols.${i}.enable`, checked);
-                              if (checked) {
-                                setAccordionValue(type);
-                                return;
-                              }
+                          >
+                            {isEnabled
+                              ? t("enabled", "Enabled")
+                              : t("disabled", "Disabled")}
+                          </span>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={!!isEnabled}
+                        className="mr-2"
+                        disabled={Boolean(
+                          initialValues?.id &&
+                            isProtocolUsedInNodes(
+                              initialValues?.id || 0,
+                              type
+                            ) &&
+                            isEnabled
+                        )}
+                        onCheckedChange={(checked) => {
+                          form.setValue(`protocols.${i}.enable`, checked);
+                          if (checked) {
+                            setAccordionValue(type);
+                            return;
+                          }
 
-                              if (accordionValue === type) {
-                                setAccordionValue(undefined);
-                              }
-                              form.clearErrors(`protocols.${i}` as any);
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pt-0 pb-4">
-                        <div className="-mx-4 space-y-4 rounded-b-lg border-t px-4 pt-4">
-                          {renderGroupCard(
-                            t("basic", "Basic Configuration"),
-                            fields,
-                            "basic",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                          {renderGroupCard(
-                            t("obfs", "Obfuscation"),
-                            fields,
-                            "obfs",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                          {renderGroupCard(
-                            t("transport", "Transport"),
-                            fields,
-                            "transport",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                          {renderGroupCard(
-                            t("security", "Security"),
-                            fields,
-                            "security",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                          {renderGroupCard(
-                            t("reality", "Reality"),
-                            fields,
-                            "reality",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                          {renderGroupCard(
-                            t("encryption", "Encryption"),
-                            fields,
-                            "encryption",
-                            control,
-                            form,
-                            i,
-                            current
-                          )}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                })}
-              </Accordion>
-            </form>
-          </Form>
-        </ScrollArea>
-        <SheetFooter className="flex-row justify-end gap-2 pt-3">
-          <Button
-            disabled={loading}
-            onClick={() => setOpen(false)}
-            variant="outline"
-          >
-            {t("cancel", "Cancel")}
-          </Button>
-          <Button
-            disabled={loading}
-            onClick={form.handleSubmit(handleSubmit, (errors) => {
-              const key = Object.keys(errors)[0] as keyof typeof errors;
-              if (key) toast.error(String(errors[key]?.message));
-              return false;
+                          if (accordionValue === type) {
+                            setAccordionValue(undefined);
+                          }
+                          form.clearErrors(`protocols.${i}` as any);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pt-0 pb-4">
+                    <div className="-mx-4 space-y-4 rounded-b-lg border-t px-4 pt-4">
+                      {renderGroupCard(
+                        t("basic", "Basic Configuration"),
+                        fields,
+                        "basic",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                      {renderGroupCard(
+                        t("obfs", "Obfuscation"),
+                        fields,
+                        "obfs",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                      {renderGroupCard(
+                        t("transport", "Transport"),
+                        fields,
+                        "transport",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                      {renderGroupCard(
+                        t("security", "Security"),
+                        fields,
+                        "security",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                      {renderGroupCard(
+                        t("reality", "Reality"),
+                        fields,
+                        "reality",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                      {renderGroupCard(
+                        t("encryption", "Encryption"),
+                        fields,
+                        "encryption",
+                        control,
+                        form,
+                        i,
+                        current
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
             })}
-          >
-            {loading && (
-              <Icon className="mr-2 animate-spin" icon="mdi:loading" />
-            )}
-            {t("confirm", "Confirm")}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          </Accordion>
+        </form>
+      </Form>
+    </DetailSheet>
   );
 }

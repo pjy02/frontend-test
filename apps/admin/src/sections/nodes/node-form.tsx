@@ -11,17 +11,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
 import { Combobox } from "@workspace/ui/composed/combobox";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import TagInput from "@workspace/ui/composed/tag-input";
 import type { TFunction } from "i18next";
 import { useEffect, useMemo, useState } from "react";
@@ -242,169 +235,18 @@ export default function NodeForm(props: {
   }
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
-        <Button
-          onClick={() => {
-            form.reset({
-              name: "",
-              server_id: undefined,
-              protocol: "",
-              address: "",
-              port: 0,
-              tags: [],
-              ...normalizeValues(initialValues),
-            });
-            setAutoFilledFields(new Set());
-          }}
+    <DetailSheet
+      description={t(
+        "formDescription",
+        "Map a public endpoint to a server listener and organize access with tags."
+      )}
+      footer={
+        <StickyActions
+          description={t(
+            "saveDescription",
+            "Changes affect newly delivered subscription configurations."
+          )}
         >
-          {trigger}
-        </Button>
-      </SheetTrigger>
-
-      <SheetContent className="w-[560px] max-w-full">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))] px-6 pt-4">
-          <Form {...form}>
-            <form className="grid grid-cols-1 gap-4">
-              <FormField
-                control={form.control}
-                name="server_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("server", "Server")}</FormLabel>
-                    <FormControl>
-                      <Combobox<number, false>
-                        onChange={(v) => handleServerChange(v)}
-                        options={servers.map((s) => ({
-                          value: s.id,
-                          label: `${s.name} (${(s.address as any) || ""})`,
-                        }))}
-                        placeholder={t("select_server", "Select server…")}
-                        value={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="protocol"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("protocol", "Protocol")}</FormLabel>
-                    <FormControl>
-                      <Combobox<string, false>
-                        onChange={(v) =>
-                          handleProtocolChange((v as ProtocolName) || null)
-                        }
-                        options={availableProtocols.map((p) => ({
-                          value: p.protocol,
-                          label: `${p.protocol}${p.port ? ` (${p.port})` : ""}`,
-                        }))}
-                        placeholder={t("select_protocol", "Select protocol…")}
-                        value={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("name", "Name")}</FormLabel>
-                    <FormControl>
-                      <EnhancedInput
-                        {...field}
-                        onValueChange={(v) =>
-                          handleManualFieldChange("name", v as string)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("address", "Address")}</FormLabel>
-                    <FormControl>
-                      <EnhancedInput
-                        {...field}
-                        onValueChange={(v) =>
-                          handleManualFieldChange("address", v as string)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="port"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("port", "Port")}</FormLabel>
-                    <FormControl>
-                      <EnhancedInput
-                        {...field}
-                        max={65_535}
-                        min={1}
-                        onValueChange={(v) =>
-                          handleManualFieldChange("port", Number(v))
-                        }
-                        placeholder="1-65535"
-                        type="number"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("tags", "Tags")}</FormLabel>
-                    <FormControl>
-                      <TagInput
-                        onChange={(v) => form.setValue(field.name, v)}
-                        options={existingTags}
-                        placeholder={t(
-                          "tags_placeholder",
-                          "Use Enter or comma (,) to add multiple tags"
-                        )}
-                        value={field.value || []}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        "tags_description",
-                        "Permission grouping tag (incl. plan binding and delivery policies)."
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </ScrollArea>
-
-        <SheetFooter className="flex-row justify-end gap-2 pt-3">
           <Button
             disabled={loading}
             onClick={() => setOpen(false)}
@@ -422,8 +264,166 @@ export default function NodeForm(props: {
           >
             {t("confirm", "Confirm")}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="md"
+      title={title}
+      trigger={
+        <Button
+          onClick={() => {
+            form.reset({
+              name: "",
+              server_id: undefined,
+              protocol: "",
+              address: "",
+              port: 0,
+              tags: [],
+              ...normalizeValues(initialValues),
+            });
+            setAutoFilledFields(new Set());
+          }}
+        >
+          {trigger}
+        </Button>
+      }
+    >
+      <Form {...form}>
+        <form className="grid grid-cols-1 gap-4">
+          <FormField
+            control={form.control}
+            name="server_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("server", "Server")}</FormLabel>
+                <FormControl>
+                  <Combobox<number, false>
+                    onChange={(v) => handleServerChange(v)}
+                    options={servers.map((s) => ({
+                      value: s.id,
+                      label: `${s.name} (${(s.address as any) || ""})`,
+                    }))}
+                    placeholder={t("select_server", "Select server…")}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="protocol"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("protocol", "Protocol")}</FormLabel>
+                <FormControl>
+                  <Combobox<string, false>
+                    onChange={(v) =>
+                      handleProtocolChange((v as ProtocolName) || null)
+                    }
+                    options={availableProtocols.map((p) => ({
+                      value: p.protocol,
+                      label: `${p.protocol}${p.port ? ` (${p.port})` : ""}`,
+                    }))}
+                    placeholder={t("select_protocol", "Select protocol…")}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("name", "Name")}</FormLabel>
+                <FormControl>
+                  <EnhancedInput
+                    {...field}
+                    onValueChange={(v) =>
+                      handleManualFieldChange("name", v as string)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("address", "Address")}</FormLabel>
+                <FormControl>
+                  <EnhancedInput
+                    {...field}
+                    onValueChange={(v) =>
+                      handleManualFieldChange("address", v as string)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="port"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("port", "Port")}</FormLabel>
+                <FormControl>
+                  <EnhancedInput
+                    {...field}
+                    max={65_535}
+                    min={1}
+                    onValueChange={(v) =>
+                      handleManualFieldChange("port", Number(v))
+                    }
+                    placeholder="1-65535"
+                    type="number"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("tags", "Tags")}</FormLabel>
+                <FormControl>
+                  <TagInput
+                    onChange={(v) => form.setValue(field.name, v)}
+                    options={existingTags}
+                    placeholder={t(
+                      "tags_placeholder",
+                      "Use Enter or comma (,) to add multiple tags"
+                    )}
+                    value={field.value || []}
+                  />
+                </FormControl>
+                <FormDescription>
+                  {t(
+                    "tags_description",
+                    "Permission grouping tag (incl. plan binding and delivery policies)."
+                  )}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
+    </DetailSheet>
   );
 }

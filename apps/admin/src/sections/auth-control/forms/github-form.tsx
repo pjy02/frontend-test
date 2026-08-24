@@ -21,11 +21,11 @@ import {
 } from "@workspace/ui/components/sheet";
 import { Switch } from "@workspace/ui/components/switch";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
 import {
   getAuthMethodConfig,
   updateAuthMethodConfig,
 } from "@workspace/ui/services/admin/authMethod";
+import { ChevronRight, Github, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -104,7 +104,7 @@ export default function GithubForm() {
         <div className="flex cursor-pointer items-center justify-between transition-colors">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" icon="mdi:github" />
+              <Github className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
               <p className="font-medium">
@@ -118,7 +118,7 @@ export default function GithubForm() {
               </p>
             </div>
           </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
+          <ChevronRight className="size-5 text-muted-foreground" />
         </div>
       </SheetTrigger>
       <SheetContent className="w-[500px] max-w-full md:max-w-screen-md">
@@ -218,9 +218,7 @@ export default function GithubForm() {
             {t("common.cancel", "Cancel")}
           </Button>
           <Button disabled={loading} form="github-form" type="submit">
-            {loading && (
-              <Icon className="mr-2 animate-spin" icon="mdi:loading" />
-            )}
+            {loading && <LoaderCircle className="mr-2 animate-spin" />}
             {t("common.save", "Save")}
           </Button>
         </SheetFooter>
