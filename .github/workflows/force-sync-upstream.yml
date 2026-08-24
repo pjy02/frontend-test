@@ -1,0 +1,63 @@
+name: Force Sync Upstream
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  force-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Force sync upstream except workflows
+        run: |
+          set -e
+
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "Backing up local workflows..."
+          mkdir -p /tmp/local-workflows
+          if [ -d ".github/workflows" ]; then
+            cp -a .github/workflows/. /tmp/local-workflows/
+          fi
+
+          echo "Adding upstream..."
+          git remote remove upstream 2>/dev/null || true
+          git remote add upstream https://github.com/perfect-panel/frontend.git
+
+          echo "Fetching upstream..."
+          git fetch upstream main --prune
+
+          echo "Force resetting to upstream/main..."
+          git reset --hard upstream/main
+
+          echo "Removing upstream workflows..."
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+
+          echo "Restoring local workflows..."
+          if [ -d "/tmp/local-workflows" ]; then
+            cp -a /tmp/local-workflows/. .github/workflows/
+          fi
+
+          echo "Committing preserved workflows..."
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No workflow differences to commit."
+          else
+            git commit -m "Preserve local workflows during upstream sync"
+          fi
+
+          echo "Force pushing..."
+          git push origin HEAD:main --force
+
+          echo "Sync completed."
