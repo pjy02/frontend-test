@@ -1,4 +1,6 @@
 {
+  "conversationClosed": "This conversation is closed",
+  "conversationDescription": "Messages refresh automatically while this conversation is open.",
   "cancel": "Cancel",
   "check": "Check",
   "close": "Close",
@@ -7,6 +9,9 @@
   "confirm": "Confirm",
   "confirmClose": "Are you sure you want to close?",
   "inputPlaceholder": "Please enter your question, we will reply as soon as possible.",
+  "pageDescription": "Triage customer requests, continue conversations, and close resolved cases.",
+  "pageEyebrow": "Customer support",
+  "priorityQueue": "Pending follow-up first",
   "reply": "Reply",
   "status": {
     "0": "Status",
@@ -16,7 +21,10 @@
     "4": "Closed"
   },
   "ticketList": "Ticket List",
+  "ticketDetails": "Ticket Details",
   "title": "Title",
   "updatedAt": "Updated At",
+  "uploadImage": "Upload image",
+  "send": "Send",
   "user": "User"
 }

@@ -1,4 +1,7 @@
 {
+  "draftByDefault": "New documents start hidden",
+  "pageDescription": "Publish reusable help content with tags and customer template variables.",
+  "pageEyebrow": "Customer knowledge",
   "cancel": "Cancel",
   "confirm": "Confirm",
   "confirmDelete": "Confirm Delete",
@@ -12,6 +15,7 @@
   "edit": "Edit",
   "editDocument": "Edit Document",
   "form": {
+    "description": "Write customer-facing help content and insert supported template variables.",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "content": "Content",
@@ -19,6 +23,7 @@
     "tagsPlaceholder": "Enter tags",
     "title": "Title",
     "titlePlaceholder": "Enter document title",
+    "saveHint": "New documents remain hidden until you explicitly publish them.",
     "variables": {
       "title": "Template variables (replaced with the viewing user's own data)",
       "subscribeUrl": "Subscription link (raw)",

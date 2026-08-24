@@ -190,6 +190,109 @@ const visualUser = {
   updated_at: 1_724_601_600,
 };
 
+const visualSubscribe = {
+  id: 11,
+  name: "Pro Annual",
+  description: "Primary annual subscription",
+  unit_price: 19_900,
+  currency: "USD",
+};
+
+const visualOrder = {
+  id: 701,
+  user_id: 1001,
+  order_no: "ORD-20260824-0701",
+  type: 1,
+  quantity: 1,
+  price: 19_900,
+  amount: 18_900,
+  gift_amount: 0,
+  discount: 1000,
+  coupon: "WELCOME10",
+  coupon_discount: 1000,
+  commission: 950,
+  payment: { id: 8, name: "Stripe", email: "billing@example.com" },
+  fee_amount: 0,
+  trade_no: "pi_visual_20260824",
+  status: 2,
+  subscribe_id: 11,
+  created_at: 1_724_601_600_000,
+  updated_at: 1_724_605_200_000,
+};
+
+const visualCoupon = {
+  id: 301,
+  name: "Welcome campaign",
+  code: "WELCOME10",
+  count: 500,
+  type: 1,
+  discount: 10,
+  start_time: 1_724_515_200_000,
+  expire_time: 1_727_107_200_000,
+  user_limit: 1,
+  subscribe: [11],
+  used_count: 128,
+  enable: true,
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_601_600_000,
+};
+
+const visualAnnouncement = {
+  id: 401,
+  title: "Service reliability update",
+  content: "All regions are operating normally after scheduled maintenance.",
+  show: true,
+  pinned: true,
+  popup: false,
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_601_600_000,
+};
+
+const visualDocument = {
+  id: 501,
+  title: "Getting started with your subscription",
+  content: "Use {{subscribe_url}} to connect your preferred client.",
+  tags: ["getting-started", "subscription"],
+  show: true,
+  created_at: 1_724_515_200_000,
+  updated_at: 1_724_601_600_000,
+};
+
+const visualTicket = {
+  id: 601,
+  title: "Unable to connect after renewal",
+  description: "My subscription renewed, but the client cannot refresh nodes.",
+  user_id: 1001,
+  status: 1,
+  created_at: 1_724_601_600_000,
+  updated_at: 1_724_605_200_000,
+  follow: [
+    {
+      id: 1,
+      ticket_id: 601,
+      from: "System",
+      type: 1,
+      content: "I’m checking the subscription status for you now.",
+      created_at: 1_724_603_400_000,
+    },
+  ],
+};
+
+const visualPayment = {
+  id: 8,
+  name: "Stripe Card",
+  platform: "stripe",
+  description: "Visa, Mastercard, and supported local cards",
+  icon: "",
+  domain: "payments.example.com",
+  notify_url: "https://panel.example.com/v1/notify/stripe",
+  config: {},
+  fee_mode: 1,
+  fee_percent: 2.9,
+  fee_amount: 0,
+  enable: true,
+};
+
 const globalConfig = {
   site: {
     host: "http://127.0.0.1:4173",
@@ -269,6 +372,39 @@ function responseFor(url: URL) {
     return { count: 1, list: [visualUser], total: 1 };
   }
   if (url.pathname.endsWith("/v1/admin/user/detail")) return visualUser;
+  if (url.pathname.endsWith("/v1/admin/subscribe/list")) {
+    return { count: 1, list: [visualSubscribe], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/order/list")) {
+    return { count: 1, list: [visualOrder], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/coupon/list")) {
+    return { count: 1, list: [visualCoupon], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/announcement/list")) {
+    return { count: 1, list: [visualAnnouncement], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/document/list")) {
+    return { count: 1, list: [visualDocument], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/ticket/list")) {
+    return { count: 1, list: [visualTicket], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/ticket/detail")) return visualTicket;
+  if (url.pathname.endsWith("/v1/admin/payment/list")) {
+    return { count: 1, list: [visualPayment], total: 1 };
+  }
+  if (url.pathname.endsWith("/v1/admin/payment/platform")) {
+    return {
+      list: [
+        {
+          platform: "stripe",
+          platform_field_description: { secret_key: "Secret key" },
+          platform_url: "https://stripe.com",
+        },
+      ],
+    };
+  }
   if (url.pathname.endsWith("/v1/admin/system/site_config")) {
     return {
       site_logo: "/favicon.svg",
@@ -391,6 +527,109 @@ test.describe("admin phase 0 visual baseline", () => {
     await expect(detailSheet).toBeVisible();
     await stabilizeVisuals(page);
     await expect(page).toHaveScreenshot("announcement-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("coupon business template and editor", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/coupon");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "优惠券管理" })
+    ).toBeVisible();
+    await expect(page.getByText("WELCOME10")).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "创建优惠券" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("coupon-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("document business template and editor", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/document");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "文档列表" })
+    ).toBeVisible();
+    await expect(
+      page.getByText("Getting started with your subscription")
+    ).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    await expect(page.getByRole("dialog", { name: "创建文档" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("document-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("marketing business template and broadcast workflow", async ({
+    page,
+  }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/marketing");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "营销运营" })
+    ).toBeVisible();
+    await page
+      .getByRole("button", {
+        exact: true,
+        name: "邮件广播 创建新的邮件广播活动",
+      })
+      .click();
+    await expect(page.getByRole("dialog", { name: "创建广播" })).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("marketing-broadcast-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("ticket business template and conversation", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/ticket");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "工单列表" })
+    ).toBeVisible();
+    await expect(
+      page.getByText("Unable to connect after renewal")
+    ).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "回复" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Unable to connect after renewal" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("ticket-conversation-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
+  test("payment business template and provider form", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/payment");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "支付管理" })
+    ).toBeVisible();
+    await expect(page.getByText("Stripe Card")).toBeVisible();
+    await page
+      .getByRole("button", { exact: true, name: "添加支付方式" })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "添加支付方式" })
+    ).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("payment-detail-sheet.png", {
       animations: "disabled",
       fullPage: false,
     });

@@ -13,24 +13,18 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "@workspace/ui/components/radio-group";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
 import { Switch } from "@workspace/ui/components/switch";
 import { Combobox } from "@workspace/ui/composed/combobox";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import {
   createQuotaTask,
   queryQuotaTaskPreCount,
 } from "@workspace/ui/services/admin/marketing";
 import { unitConversion } from "@workspace/ui/utils/unit-conversions";
+import { Gift, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -177,339 +171,18 @@ export default function QuotaBroadcastForm() {
   };
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" icon="mdi:gift" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("quotaBroadcast", "Quota Distribution")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "createAndSendQuotaTasks",
-                  "Create and Distribute Quota Tasks"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
-      </SheetTrigger>
-      <SheetContent className="w-[600px] max-w-full md:max-w-screen-md">
-        <SheetHeader>
-          <SheetTitle>{t("createQuotaTask", "Create Quota Task")}</SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100dvh-48px-36px-32px-env(safe-area-inset-top))] px-6">
-          <Form {...form}>
-            <form
-              className="mt-4 space-y-6"
-              id="quota-broadcast-form"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              {/* Subscribers selection */}
-              <FormField
-                control={form.control}
-                name="subscribers"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("subscribers", "Packages")}</FormLabel>
-                    <FormControl>
-                      <Combobox
-                        multiple={true}
-                        onChange={field.onChange}
-                        options={subscribes?.map((subscribe) => ({
-                          value: subscribe.id!,
-                          label: subscribe.name!,
-                          children: (
-                            <div>
-                              <div>{subscribe.name}</div>
-                              <div className="text-muted-foreground text-xs">
-                                <Display
-                                  type="traffic"
-                                  value={subscribe.traffic || 0}
-                                />{" "}
-                                /{" "}
-                                <Display
-                                  type="currency"
-                                  value={subscribe.unit_price || 0}
-                                />
-                              </div>
-                            </div>
-                          ),
-                        }))}
-                        placeholder={t(
-                          "pleaseSelectSubscribers",
-                          "Please select packages"
-                        )}
-                        value={field.value || []}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Subscription count info and active status */}
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="is_active"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("validOnly", "Valid Only")}</FormLabel>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          className="!mt-0 float-end"
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t(
-                          "selectValidSubscriptionsOnly",
-                          "Select currently valid subscriptions only"
-                        )}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex items-center border-l-4 border-l-primary bg-primary/10 px-4 py-3 text-sm">
-                  <span className="text-muted-foreground">
-                    {t("subscriptionCount", "Subscription Count")}:{" "}
-                  </span>
-                  <span className="font-medium text-lg text-primary">
-                    {isCalculating ? (
-                      <Icon
-                        className="ml-2 h-4 w-4 animate-spin"
-                        icon="mdi:loading"
-                      />
-                    ) : (
-                      recipients.toLocaleString()
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              {/* Subscription validity period range */}
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="start_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {t(
-                          "subscriptionValidityStartDate",
-                          "Subscription Validity Start Date"
-                        )}
-                      </FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          onValueChange={field.onChange}
-                          step="1"
-                          type="datetime-local"
-                          value={field.value}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t(
-                          "includeSubscriptionsValidAfter",
-                          "Include subscriptions valid on or after this date"
-                        )}
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="end_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {t(
-                          "subscriptionValidityEndDate",
-                          "Subscription Validity End Date"
-                        )}
-                      </FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          onValueChange={field.onChange}
-                          step="1"
-                          type="datetime-local"
-                          value={field.value}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t(
-                          "includeSubscriptionsValidBefore",
-                          "Include subscriptions valid on or before this date"
-                        )}
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Reset traffic */}
-              <FormField
-                control={form.control}
-                name="reset_traffic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("resetTraffic", "Reset Traffic")}</FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        className="!mt-0 float-end"
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        "resetTrafficDescription",
-                        "Whether to reset subscription used traffic"
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Quota days */}
-              <FormField
-                control={form.control}
-                name="days"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {t("quotaDays", "Extend Expiration Days")}
-                    </FormLabel>
-                    <FormControl>
-                      <EnhancedInput
-                        min={1}
-                        onValueChange={(value) =>
-                          field.onChange(Number.parseInt(value, 10))
-                        }
-                        type="number"
-                        value={field.value?.toString()}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        "numberOfDaysForTheQuota",
-                        "Number of days to extend subscription expiration"
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Gift configuration */}
-              <FormField
-                control={form.control}
-                name="gift_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("giftType", "Gift Amount Type")}</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        className="flex gap-4"
-                        defaultValue={String(field.value)}
-                        onValueChange={(value) => {
-                          field.onChange(Number(value));
-                          form.setValue("gift_value", 0);
-                        }}
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="1" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {t("fixedAmount", "Fixed Amount")}
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="2" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {t("percentageAmount", "Percentage Amount")}
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Gift amount based on type */}
-              {form.watch("gift_type") === 1 && (
-                <FormField
-                  control={form.control}
-                  name="gift_value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("giftAmount", "Gift Amount")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput<number>
-                          formatInput={(value) =>
-                            unitConversion("centsToDollars", value)
-                          }
-                          formatOutput={(value) =>
-                            unitConversion("dollarsToCents", value)
-                          }
-                          min={1}
-                          onValueChange={(value) => field.onChange(value)}
-                          placeholder={t("enterAmount", "Enter amount")}
-                          type="number"
-                          value={field.value}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {form.watch("gift_type") === 2 && (
-                <FormField
-                  control={form.control}
-                  name="gift_value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("giftAmount", "Gift Amount")}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          max={100}
-                          min={1}
-                          onValueChange={(value) => field.onChange(value)}
-                          placeholder={t("enterPercentage", "Enter percentage")}
-                          suffix="%"
-                          type="number"
-                          value={field.value}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {t(
-                          "percentageAmountDescription",
-                          "Gift percentage amount based on current package price"
-                        )}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </form>
-          </Form>
-        </ScrollArea>
-        <SheetFooter className="flex flex-row items-center justify-end gap-2 pt-3">
+    <DetailSheet
+      description={t(
+        "quotaBroadcastDescription",
+        "Select the affected subscriptions, active window, and quota changes."
+      )}
+      footer={
+        <StickyActions
+          description={t(
+            "quotaBroadcastSaveHint",
+            "Review the affected customer count before creating this task."
+          )}
+        >
           <Button onClick={() => setOpen(false)} variant="outline">
             {t("cancel", "Cancel")}
           </Button>
@@ -522,13 +195,327 @@ export default function QuotaBroadcastForm() {
             form="quota-broadcast-form"
             type="submit"
           >
-            {isSubmitting && (
-              <Icon className="mr-2 h-4 w-4 animate-spin" icon="mdi:loading" />
-            )}
+            {isSubmitting && <LoaderCircle className="animate-spin" />}
             {t("createQuotaTask", "Create Quota Task")}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="lg"
+      title={t("createQuotaTask", "Create Quota Task")}
+      trigger={
+        <SettingsEntry
+          description={t(
+            "createAndSendQuotaTasks",
+            "Create and Distribute Quota Tasks"
+          )}
+          icon={Gift}
+          title={t("quotaBroadcast", "Quota Distribution")}
+        />
+      }
+    >
+      <Form {...form}>
+        <form
+          className="space-y-6"
+          id="quota-broadcast-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          {/* Subscribers selection */}
+          <FormField
+            control={form.control}
+            name="subscribers"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("subscribers", "Packages")}</FormLabel>
+                <FormControl>
+                  <Combobox
+                    multiple={true}
+                    onChange={field.onChange}
+                    options={subscribes?.map((subscribe) => ({
+                      value: subscribe.id!,
+                      label: subscribe.name!,
+                      children: (
+                        <div>
+                          <div>{subscribe.name}</div>
+                          <div className="text-muted-foreground text-xs">
+                            <Display
+                              type="traffic"
+                              value={subscribe.traffic || 0}
+                            />{" "}
+                            /{" "}
+                            <Display
+                              type="currency"
+                              value={subscribe.unit_price || 0}
+                            />
+                          </div>
+                        </div>
+                      ),
+                    }))}
+                    placeholder={t(
+                      "pleaseSelectSubscribers",
+                      "Please select packages"
+                    )}
+                    value={field.value || []}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Subscription count info and active status */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="is_active"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("validOnly", "Valid Only")}</FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      className="!mt-0 float-end"
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      "selectValidSubscriptionsOnly",
+                      "Select currently valid subscriptions only"
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center border-l-4 border-l-primary bg-primary/10 px-4 py-3 text-sm">
+              <span className="text-muted-foreground">
+                {t("subscriptionCount", "Subscription Count")}:{" "}
+              </span>
+              <span className="font-medium text-lg text-primary">
+                {isCalculating ? (
+                  <LoaderCircle className="ml-2 size-4 animate-spin" />
+                ) : (
+                  recipients.toLocaleString()
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Subscription validity period range */}
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="start_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {t(
+                      "subscriptionValidityStartDate",
+                      "Subscription Validity Start Date"
+                    )}
+                  </FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      onValueChange={field.onChange}
+                      step="1"
+                      type="datetime-local"
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      "includeSubscriptionsValidAfter",
+                      "Include subscriptions valid on or after this date"
+                    )}
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="end_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {t(
+                      "subscriptionValidityEndDate",
+                      "Subscription Validity End Date"
+                    )}
+                  </FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      onValueChange={field.onChange}
+                      step="1"
+                      type="datetime-local"
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      "includeSubscriptionsValidBefore",
+                      "Include subscriptions valid on or before this date"
+                    )}
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Reset traffic */}
+          <FormField
+            control={form.control}
+            name="reset_traffic"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("resetTraffic", "Reset Traffic")}</FormLabel>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    className="!mt-0 float-end"
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormDescription>
+                  {t(
+                    "resetTrafficDescription",
+                    "Whether to reset subscription used traffic"
+                  )}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Quota days */}
+          <FormField
+            control={form.control}
+            name="days"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  {t("quotaDays", "Extend Expiration Days")}
+                </FormLabel>
+                <FormControl>
+                  <EnhancedInput
+                    min={1}
+                    onValueChange={(value) =>
+                      field.onChange(Number.parseInt(value, 10))
+                    }
+                    type="number"
+                    value={field.value?.toString()}
+                  />
+                </FormControl>
+                <FormDescription>
+                  {t(
+                    "numberOfDaysForTheQuota",
+                    "Number of days to extend subscription expiration"
+                  )}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Gift configuration */}
+          <FormField
+            control={form.control}
+            name="gift_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("giftType", "Gift Amount Type")}</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    className="flex gap-4"
+                    defaultValue={String(field.value)}
+                    onValueChange={(value) => {
+                      field.onChange(Number(value));
+                      form.setValue("gift_value", 0);
+                    }}
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="1" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        {t("fixedAmount", "Fixed Amount")}
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="2" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        {t("percentageAmount", "Percentage Amount")}
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Gift amount based on type */}
+          {form.watch("gift_type") === 1 && (
+            <FormField
+              control={form.control}
+              name="gift_value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("giftAmount", "Gift Amount")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput<number>
+                      formatInput={(value) =>
+                        unitConversion("centsToDollars", value)
+                      }
+                      formatOutput={(value) =>
+                        unitConversion("dollarsToCents", value)
+                      }
+                      min={1}
+                      onValueChange={(value) => field.onChange(value)}
+                      placeholder={t("enterAmount", "Enter amount")}
+                      type="number"
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {form.watch("gift_type") === 2 && (
+            <FormField
+              control={form.control}
+              name="gift_value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("giftAmount", "Gift Amount")}</FormLabel>
+                  <FormControl>
+                    <EnhancedInput
+                      max={100}
+                      min={1}
+                      onValueChange={(value) => field.onChange(value)}
+                      placeholder={t("enterPercentage", "Enter percentage")}
+                      suffix="%"
+                      type="number"
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      "percentageAmountDescription",
+                      "Gift percentage amount based on current package price"
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+        </form>
+      </Form>
+    </DetailSheet>
   );
 }

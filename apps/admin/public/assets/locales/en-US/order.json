@@ -3,8 +3,12 @@
   "couponDiscount": "Coupon Discount",
   "discount": "Discount Amount",
   "feeAmount": "Fee Amount",
+  "liveOrderData": "Live order data",
   "method": "Payment Method",
   "orderNumber": "Order Number",
+  "pageDescription": "Review purchases, payments, renewals, and fulfillment status.",
+  "pageEyebrow": "Commerce operations",
+  "pageTitle": "Order Management",
   "status": {
     "0": "Status",
     "1": "Pending",

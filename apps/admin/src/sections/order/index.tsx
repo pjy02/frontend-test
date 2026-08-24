@@ -1,5 +1,4 @@
 import { useSearch } from "@tanstack/react-router";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   HoverCard,
@@ -8,11 +7,15 @@ import {
 } from "@workspace/ui/components/hover-card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Combobox } from "@workspace/ui/composed/combobox";
+import { PageHeader } from "@workspace/ui/composed/page-header";
 import {
   ProTable,
   type ProTableActions,
 } from "@workspace/ui/composed/pro-table/pro-table";
-import { cn } from "@workspace/ui/lib/utils";
+import {
+  StatusBadge,
+  type StatusTone,
+} from "@workspace/ui/composed/status-badge";
 import {
   getOrderList,
   updateOrderStatus,
@@ -24,6 +27,14 @@ import { useSubscribe } from "@/stores/subscribe";
 import { formatDate } from "@/utils/common";
 import { UserDetail } from "../user/user-detail";
 
+const orderStatusTones: Record<number, StatusTone> = {
+  1: "warning",
+  2: "success",
+  3: "neutral",
+  4: "destructive",
+  5: "success",
+};
+
 export default function Order() {
   const { t } = useTranslation("order");
   const sp = useSearch({ strict: false }) as Record<string, string | undefined>;
@@ -32,19 +43,16 @@ export default function Order() {
     {
       value: 1,
       label: t("status.1", "Pending"),
-      className: "bg-orange-500",
     },
-    { value: 2, label: t("status.2", "Paid"), className: "bg-green-500" },
+    { value: 2, label: t("status.2", "Paid") },
     {
       value: 3,
       label: t("status.3", "Cancelled"),
-      className: "bg-gray-500",
     },
-    { value: 4, label: t("status.4", "Closed"), className: "bg-red-500" },
+    { value: 4, label: t("status.4", "Closed") },
     {
       value: 5,
       label: t("status.5", "Completed"),
-      className: "bg-green-500",
     },
   ];
 
@@ -64,210 +72,224 @@ export default function Order() {
   };
 
   return (
-    <ProTable<API.Order, any>
-      action={ref}
-      columns={[
-        {
-          accessorKey: "order_no",
-          header: t("orderNumber", "Order Number"),
-        },
-        {
-          accessorKey: "type",
-          header: t("type.0", "Type"),
-          cell: ({ row }) => {
-            const type = row.getValue("type") as number;
-            return (
-              typeOptions.find((opt) => opt.value === type)?.label ||
-              t(`type.${type}`)
-            );
+    <div className="grid gap-5">
+      <PageHeader
+        description={t(
+          "pageDescription",
+          "Review purchases, payments, renewals, and fulfillment status."
+        )}
+        eyebrow={t("pageEyebrow", "Commerce operations")}
+        metadata={
+          <StatusBadge tone="info">
+            {t("liveOrderData", "Live order data")}
+          </StatusBadge>
+        }
+        title={t("pageTitle", "Order Management")}
+      />
+      <ProTable<API.Order, any>
+        action={ref}
+        columns={[
+          {
+            accessorKey: "order_no",
+            header: t("orderNumber", "Order Number"),
           },
-        },
-        {
-          accessorKey: "subscribe_id",
-          header: t("subscribe", "Subscribe"),
-          cell: ({ row }) => {
-            const order = row.original as API.Order;
-            if (order.type === 4) {
+          {
+            accessorKey: "type",
+            header: t("type.0", "Type"),
+            cell: ({ row }) => {
               const type = row.getValue("type") as number;
               return (
                 typeOptions.find((opt) => opt.value === type)?.label ||
                 t(`type.${type}`)
               );
-            }
-            const name = getSubscribeName(order.subscribe_id);
-            const quantity = order.quantity;
-            return name ? `${name} × ${quantity}` : "";
+            },
           },
-        },
-        {
-          accessorKey: "amount",
-          header: t("amount", "Amount"),
-          cell: ({ row }) => {
-            const order = row.original as API.Order;
-            return (
-              <HoverCard>
-                <HoverCardTrigger asChild>
-                  <Button className="p-0" variant="link">
-                    <Display type="currency" value={order.amount} />
-                  </Button>
-                </HoverCardTrigger>
-                <HoverCardContent className="w-auto max-w-[80vw]">
-                  <div className="grid gap-3">
-                    {order.trade_no && (
-                      <>
-                        <div className="font-semibold">
-                          {t("tradeNo", "Transaction Number")}
-                        </div>
-                        <span className="break-all text-muted-foreground">
-                          {order.trade_no}
-                        </span>
-                        <Separator className="my-2" />
-                      </>
-                    )}
+          {
+            accessorKey: "subscribe_id",
+            header: t("subscribe", "Subscribe"),
+            cell: ({ row }) => {
+              const order = row.original as API.Order;
+              if (order.type === 4) {
+                const type = row.getValue("type") as number;
+                return (
+                  typeOptions.find((opt) => opt.value === type)?.label ||
+                  t(`type.${type}`)
+                );
+              }
+              const name = getSubscribeName(order.subscribe_id);
+              const quantity = order.quantity;
+              return name ? `${name} × ${quantity}` : "";
+            },
+          },
+          {
+            accessorKey: "amount",
+            header: t("amount", "Amount"),
+            cell: ({ row }) => {
+              const order = row.original as API.Order;
+              return (
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Button className="p-0" variant="link">
+                      <Display type="currency" value={order.amount} />
+                    </Button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-auto max-w-[80vw]">
+                    <div className="grid gap-3">
+                      {order.trade_no && (
+                        <>
+                          <div className="font-semibold">
+                            {t("tradeNo", "Transaction Number")}
+                          </div>
+                          <span className="break-all text-muted-foreground">
+                            {order.trade_no}
+                          </span>
+                          <Separator className="my-2" />
+                        </>
+                      )}
+                      <ul className="grid gap-3">
+                        <li className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            {t("subscribePrice", "Subscription Price")}
+                          </span>
+                          <span>
+                            <Display type="currency" value={order.price} />
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            {t("discount", "Discount Amount")}
+                          </span>
+                          <span>
+                            <Display type="currency" value={order.discount} />
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            {t("couponDiscount", "Coupon Discount")}
+                          </span>
+                          <span>
+                            <Display
+                              type="currency"
+                              value={order.coupon_discount}
+                            />
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            {t("feeAmount", "Fee Amount")}
+                          </span>
+                          <span>
+                            <Display type="currency" value={order.fee_amount} />
+                          </span>
+                        </li>
+                        <li className="flex items-center justify-between font-semibold">
+                          <span className="text-muted-foreground">
+                            {t("total", "Total")}
+                          </span>
+                          <span>
+                            <Display type="currency" value={order.amount} />
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                    <Separator className="my-4" />
                     <ul className="grid gap-3">
                       <li className="flex items-center justify-between">
                         <span className="text-muted-foreground">
-                          {t("subscribePrice", "Subscription Price")}
+                          {t("method", "Payment Method")}
                         </span>
                         <span>
-                          <Display type="currency" value={order.price} />
-                        </span>
-                      </li>
-                      <li className="flex items-center justify-between">
-                        <span className="text-muted-foreground">
-                          {t("discount", "Discount Amount")}
-                        </span>
-                        <span>
-                          <Display type="currency" value={order.discount} />
-                        </span>
-                      </li>
-                      <li className="flex items-center justify-between">
-                        <span className="text-muted-foreground">
-                          {t("couponDiscount", "Coupon Discount")}
-                        </span>
-                        <span>
-                          <Display
-                            type="currency"
-                            value={order.coupon_discount}
-                          />
-                        </span>
-                      </li>
-                      <li className="flex items-center justify-between">
-                        <span className="text-muted-foreground">
-                          {t("feeAmount", "Fee Amount")}
-                        </span>
-                        <span>
-                          <Display type="currency" value={order.fee_amount} />
-                        </span>
-                      </li>
-                      <li className="flex items-center justify-between font-semibold">
-                        <span className="text-muted-foreground">
-                          {t("total", "Total")}
-                        </span>
-                        <span>
-                          <Display type="currency" value={order.amount} />
+                          {order.payment?.name || order.payment?.platform}
                         </span>
                       </li>
                     </ul>
-                  </div>
-                  <Separator className="my-4" />
-                  <ul className="grid gap-3">
-                    <li className="flex items-center justify-between">
-                      <span className="text-muted-foreground">
-                        {t("method", "Payment Method")}
-                      </span>
-                      <span>
-                        {order.payment?.name || order.payment?.platform}
-                      </span>
-                    </li>
-                  </ul>
-                </HoverCardContent>
-              </HoverCard>
-            );
-          },
-        },
-        {
-          accessorKey: "user_id",
-          header: t("user", "User"),
-          cell: ({ row }) => {
-            const order = row.original as API.Order;
-            return <UserDetail id={order.user_id} />;
-          },
-        },
-        {
-          accessorKey: "updated_at",
-          header: t("updateTime", "Update Time"),
-          cell: ({ row }) => {
-            const order = row.original as API.Order;
-            return formatDate(order.updated_at);
-          },
-        },
-        {
-          accessorKey: "status",
-          header: t("status.0", "Status"),
-          cell: ({ row }) => {
-            const order = row.original as API.Order;
-            const option = statusOptions.find(
-              (opt) => opt.value === order.status
-            );
-            if ([1, 3, 4].includes(row.getValue("status"))) {
-              return (
-                <Combobox<number, false>
-                  className={cn(option?.className)}
-                  onChange={async (value) => {
-                    await updateOrderStatus({
-                      id: order.id,
-                      status: value,
-                    });
-                    ref.current?.refresh();
-                  }}
-                  options={statusOptions}
-                  placeholder={t("status.0", "Status")}
-                  value={order.status}
-                />
+                  </HoverCardContent>
+                </HoverCard>
               );
-            }
-            return (
-              <Badge>
-                {option?.label || t(`status.${row.getValue("status")}`)}
-              </Badge>
-            );
+            },
           },
-        },
-      ]}
-      initialFilters={initialFilters}
-      key={JSON.stringify(initialFilters)}
-      params={[
-        {
-          key: "status",
-          placeholder: t("status.0", "Status"),
-          options: statusOptions.map((item) => ({
-            label: item.label,
-            value: String(item.value),
-          })),
-        },
-        {
-          key: "subscribe_id",
-          placeholder: `${t("subscribe", "Subscribe")}`,
-          options: subscribes?.map((item) => ({
-            label: item.name!,
-            value: String(item.id),
-          })),
-        },
-        { key: "search" },
-        {
-          key: "user_id",
-          placeholder: `${t("user", "User")} ID`,
-          options: undefined,
-        },
-      ]}
-      request={async (pagination, filter) => {
-        const { data } = await getOrderList({ ...pagination, ...filter });
-        return {
-          list: data.data?.list || [],
-          total: data.data?.total || 0,
-        };
-      }}
-    />
+          {
+            accessorKey: "user_id",
+            header: t("user", "User"),
+            cell: ({ row }) => {
+              const order = row.original as API.Order;
+              return <UserDetail id={order.user_id} />;
+            },
+          },
+          {
+            accessorKey: "updated_at",
+            header: t("updateTime", "Update Time"),
+            cell: ({ row }) => {
+              const order = row.original as API.Order;
+              return formatDate(order.updated_at);
+            },
+          },
+          {
+            accessorKey: "status",
+            header: t("status.0", "Status"),
+            cell: ({ row }) => {
+              const order = row.original as API.Order;
+              const option = statusOptions.find(
+                (opt) => opt.value === order.status
+              );
+              if ([1, 3, 4].includes(row.getValue("status"))) {
+                return (
+                  <Combobox<number, false>
+                    onChange={async (value) => {
+                      await updateOrderStatus({
+                        id: order.id,
+                        status: value,
+                      });
+                      ref.current?.refresh();
+                    }}
+                    options={statusOptions}
+                    placeholder={t("status.0", "Status")}
+                    value={order.status}
+                  />
+                );
+              }
+              return (
+                <StatusBadge tone={orderStatusTones[order.status] || "neutral"}>
+                  {option?.label || t(`status.${row.getValue("status")}`)}
+                </StatusBadge>
+              );
+            },
+          },
+        ]}
+        initialFilters={initialFilters}
+        key={JSON.stringify(initialFilters)}
+        params={[
+          {
+            key: "status",
+            placeholder: t("status.0", "Status"),
+            options: statusOptions.map((item) => ({
+              label: item.label,
+              value: String(item.value),
+            })),
+          },
+          {
+            key: "subscribe_id",
+            placeholder: `${t("subscribe", "Subscribe")}`,
+            options: subscribes?.map((item) => ({
+              label: item.name!,
+              value: String(item.id),
+            })),
+          },
+          { key: "search" },
+          {
+            key: "user_id",
+            placeholder: `${t("user", "User")} ID`,
+            options: undefined,
+          },
+        ]}
+        request={async (pagination, filter) => {
+          const { data } = await getOrderList({ ...pagination, ...filter });
+          return {
+            list: data.data?.list || [],
+            total: data.data?.total || 0,
+          };
+        }}
+      />
+    </div>
   );
 }

@@ -1,4 +1,9 @@
 {
+  "disabledByDefault": "New methods start disabled",
+  "formDescription": "Configure provider credentials, callback behavior, fees, and customer-facing details.",
+  "pageDescription": "Configure payment providers, callback endpoints, and customer fees.",
+  "pageEyebrow": "Revenue infrastructure",
+  "saveHint": "Verify provider credentials and callback domains before enabling this method.",
   "applyForPayment": "Apply for Payment",
   "batchDelete": "Batch Delete",
   "cancel": "Cancel",

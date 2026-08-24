@@ -1,4 +1,7 @@
 {
+  "draftByDefault": "新文档默认隐藏",
+  "pageDescription": "使用标签和用户模板变量发布可复用的帮助内容。",
+  "pageEyebrow": "客户知识库",
   "cancel": "取消",
   "confirm": "确认",
   "confirmDelete": "确认删除",
@@ -12,6 +15,7 @@
   "edit": "编辑",
   "editDocument": "编辑文档",
   "form": {
+    "description": "编写面向用户的帮助内容，并插入支持的模板变量。",
     "cancel": "取消",
     "confirm": "确认",
     "content": "内容",
@@ -19,6 +23,7 @@
     "tagsPlaceholder": "输入标签",
     "title": "标题",
     "titlePlaceholder": "输入文档标题",
+    "saveHint": "新文档只有在明确发布后才会展示。",
     "variables": {
       "title": "模板变量（查看文档时替换为当前用户自己的数据）",
       "subscribeUrl": "订阅链接（原始）",

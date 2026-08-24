@@ -6,6 +6,7 @@ import {
   ProTable,
   type ProTableActions,
 } from "@workspace/ui/composed/pro-table/pro-table";
+import { StatusBadge } from "@workspace/ui/composed/status-badge";
 import {
   createAnnouncement,
   deleteAnnouncement,
@@ -53,6 +54,11 @@ export default function Page() {
           "Create and control notices shown across the customer experience."
         )}
         eyebrow={t("pageEyebrow", "Content operations")}
+        metadata={
+          <StatusBadge tone="info">
+            {t("channelControls", "Display, pin, and popup controls")}
+          </StatusBadge>
+        }
         title={t("announcementList", "Announcement List")}
       />
       <ProTable<API.Announcement, { enable: boolean; search: string }>

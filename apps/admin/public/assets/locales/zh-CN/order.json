@@ -3,8 +3,12 @@
   "couponDiscount": "优惠券折扣",
   "discount": "折扣金额",
   "feeAmount": "手续费",
+  "liveOrderData": "实时订单数据",
   "method": "支付方式",
   "orderNumber": "订单编号",
+  "pageDescription": "集中核对购买、支付、续费与履约状态。",
+  "pageEyebrow": "商业运营",
+  "pageTitle": "订单管理",
   "status": {
     "0": "状态",
     "1": "待支付",

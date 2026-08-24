@@ -1,4 +1,8 @@
 {
+  "disabledByDefault": "New coupons start disabled",
+  "pageDescription": "Create targeted promotions and monitor redemption capacity.",
+  "pageEyebrow": "Revenue tools",
+  "pageTitle": "Coupon Management",
   "amount": "Amount",
   "cancel": "Cancel",
   "code": "Code",
@@ -16,6 +20,7 @@
   "editCoupon": "Edit Coupon",
   "enable": "Enable",
   "form": {
+    "description": "Define eligibility, value, capacity, and the active campaign window.",
     "amountDiscount": "Amount Discount",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -33,7 +38,8 @@
     "startTime": "Start Time",
     "type": "Coupon Type",
     "userLimit": "Max Usage Count per User",
-    "userLimitPlaceholder": "Max Usage Count per User (leave blank for no limit)"
+    "userLimitPlaceholder": "Max Usage Count per User (leave blank for no limit)",
+    "saveHint": "New coupons remain disabled until you explicitly enable them."
   },
   "name": "Name",
   "percentage": "Percentage",

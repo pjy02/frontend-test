@@ -1,4 +1,8 @@
 {
+  "disabledByDefault": "新优惠券默认停用",
+  "pageDescription": "创建定向促销活动并监控可用次数与核销情况。",
+  "pageEyebrow": "营收工具",
+  "pageTitle": "优惠券管理",
   "amount": "金额",
   "cancel": "取消",
   "code": "优惠码",
@@ -16,6 +20,7 @@
   "editCoupon": "编辑优惠券",
   "enable": "启用",
   "form": {
+    "description": "配置适用范围、优惠价值、使用容量和活动时间。",
     "amountDiscount": "金额折扣",
     "cancel": "取消",
     "confirm": "确认",
@@ -33,7 +38,8 @@
     "startTime": "开始时间",
     "type": "优惠券类型",
     "userLimit": "每用户最大使用次数",
-    "userLimitPlaceholder": "每用户最大使用次数（留空不限制）"
+    "userLimitPlaceholder": "每用户最大使用次数（留空不限制）",
+    "saveHint": "新优惠券只有在明确启用后才会生效。"
   },
   "name": "名称",
   "percentage": "百分比",

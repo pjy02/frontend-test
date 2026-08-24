@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
   SelectContent,
@@ -19,27 +18,22 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
-import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { HTMLEditor } from "@workspace/ui/composed/editor/html";
 import { EnhancedInput } from "@workspace/ui/composed/enhanced-input";
-import { Icon } from "@workspace/ui/composed/icon";
+import { SettingsEntry } from "@workspace/ui/composed/settings-entry";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
 import {
   createBatchSendEmailTask,
   getPreSendEmailCount,
 } from "@workspace/ui/services/admin/marketing";
+import { LoaderCircle, SendHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -280,382 +274,23 @@ export default function EmailBroadcastForm() {
   };
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" icon="mdi:email-send" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                {t("emailBroadcast", "Email Broadcast")}
-              </p>
-              <p className="text-muted-foreground text-sm">
-                {t(
-                  "createNewEmailBroadcastCampaign",
-                  "Create new email broadcast campaign"
-                )}
-              </p>
-            </div>
-          </div>
-          <Icon className="size-6" icon="mdi:chevron-right" />
-        </div>
-      </SheetTrigger>
-      <SheetContent className="w-[700px] max-w-full md:max-w-screen-lg">
-        <SheetHeader>
-          <SheetTitle>{t("createBroadcast", "Create Broadcast")}</SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))] px-6">
-          <Form {...form}>
-            <form
-              className="space-y-2 pt-4"
-              id="broadcast-form"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <Tabs className="space-y-2" defaultValue="content">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="content">
-                    {t("content", "Email Content")}
-                  </TabsTrigger>
-                  <TabsTrigger value="settings">
-                    {t("sendSettings", "Send Settings")}
-                  </TabsTrigger>
-                </TabsList>
-                {/* Email Content Tab */}
-                <TabsContent className="space-y-2" value="content">
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("subject", "Email Subject")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={`${t("pleaseEnter", "Please enter")} ${t("subject", "Email Subject").toLowerCase()}`}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("content", "Email Content")}</FormLabel>
-                        <FormControl>
-                          <HTMLEditor
-                            onChange={(value) => {
-                              form.setValue(field.name, value || "");
-                            }}
-                            value={field.value}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          {t(
-                            "useMarkdownEditor",
-                            "Use Markdown editor to write email content with preview functionality"
-                          )}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-
-                {/* Send Settings Tab */}
-                <TabsContent className="space-y-2" value="settings">
-                  {/* Send scope and estimated recipients */}
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <FormField
-                      control={form.control}
-                      name="scope"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("sendScope", "Send Scope")}</FormLabel>
-                          <Select
-                            onValueChange={(value) =>
-                              field.onChange(Number.parseInt(value, 10))
-                            }
-                            value={field.value?.toString() || "1"}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue
-                                  placeholder={t(
-                                    "selectSendScope",
-                                    "Select send scope"
-                                  )}
-                                />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="1">
-                                {t("allUsers", "All Users")}
-                              </SelectItem>{" "}
-                              {/* ScopeAll */}
-                              <SelectItem value="2">
-                                {t(
-                                  "subscribedUsersOnly",
-                                  "Subscribed users only"
-                                )}
-                              </SelectItem>{" "}
-                              {/* ScopeActive */}
-                              <SelectItem value="3">
-                                {t(
-                                  "expiredSubscriptionUsersOnly",
-                                  "Expired subscription users only"
-                                )}
-                              </SelectItem>{" "}
-                              {/* ScopeExpired */}
-                              <SelectItem value="4">
-                                {t(
-                                  "noSubscriptionUsersOnly",
-                                  "No subscription users only"
-                                )}
-                              </SelectItem>{" "}
-                              {/* ScopeNone */}
-                              <SelectItem value="5">
-                                {t(
-                                  "specificUsersOnly",
-                                  "Additional emails only (skip platform users)"
-                                )}
-                              </SelectItem>{" "}
-                              {/* ScopeSkip */}
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>
-                            {t(
-                              "sendScopeDescription",
-                              'Choose the user scope for email sending. Select "Additional emails only" to send only to the email addresses filled below'
-                            )}
-                          </FormDescription>
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Estimated recipients info */}
-                    <div className="flex justify-end">
-                      <div className="border-l-4 border-l-primary bg-primary/10 px-4 py-3 text-sm">
-                        <span className="text-muted-foreground">
-                          {t("estimatedRecipients", "Estimated recipients")}:{" "}
-                        </span>
-                        <span className="font-medium text-lg text-primary">
-                          {estimatedRecipients.total}
-                        </span>
-                        <span className="ml-2 text-muted-foreground text-xs">
-                          ({t("users", "users")}: {estimatedRecipients.users},{" "}
-                          {t("additional", "Additional")}:{" "}
-                          {estimatedRecipients.additional})
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="register_start_time"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t(
-                              "registrationStartDate",
-                              "Registration Start Date"
-                            )}
-                          </FormLabel>
-                          <FormControl>
-                            <EnhancedInput
-                              disabled={form.watch("scope") === 5}
-                              onValueChange={field.onChange}
-                              step="1" // ScopeSkip
-                              type="datetime-local"
-                              value={field.value}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {t(
-                              "includeUsersRegisteredAfter",
-                              "Include users registered on or after this date"
-                            )}
-                          </FormDescription>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="register_end_time"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t("registrationEndDate", "Registration End Date")}
-                          </FormLabel>
-                          <FormControl>
-                            <EnhancedInput
-                              disabled={form.watch("scope") === 5}
-                              onValueChange={field.onChange}
-                              step="1" // ScopeSkip
-                              type="datetime-local"
-                              value={field.value}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {t(
-                              "includeUsersRegisteredBefore",
-                              "Include users registered on or before this date"
-                            )}
-                          </FormDescription>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Additional recipients */}
-                  <FormField
-                    control={form.control}
-                    name="additional"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {t(
-                            "additionalRecipientEmails",
-                            "Additional recipient emails"
-                          )}
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="min-h-[120px] font-mono text-sm"
-                            placeholder={`${t("pleaseEnter", "Please enter")}${t("additionalRecipientEmails", "Additional recipient emails").toLowerCase()}，${t("onePerLine", "one per line")}，for example:\nexample1@domain.com\nexample2@domain.com\nexample3@domain.com`}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          {t(
-                            "additionalRecipientsDescription",
-                            "These emails will receive the broadcast in addition to the user filter above"
-                          )}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Send time settings */}
-                  <FormField
-                    control={form.control}
-                    name="scheduled"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {t("scheduledSend", "Schedule Send")}
-                        </FormLabel>
-                        <FormControl>
-                          <EnhancedInput
-                            onValueChange={field.onChange}
-                            placeholder={t(
-                              "leaveEmptyForImmediateSend",
-                              "Leave empty for immediate send"
-                            )}
-                            step="1"
-                            type="datetime-local"
-                            value={field.value}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          {t(
-                            "selectSendTime",
-                            "Select send time, leave empty for immediate send"
-                          )}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Send rate control */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="interval"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t("emailInterval", "Email Interval (seconds)")}
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              min={1}
-                              placeholder="1"
-                              step={0.1}
-                              type="number"
-                              {...field}
-                              onChange={(e) =>
-                                field.onChange(
-                                  Number.parseFloat(e.target.value) || 1
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {t(
-                              "intervalTimeBetweenEmails",
-                              "Interval time between each email"
-                            )}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="limit"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t("dailySendLimit", "Daily Send Limit")}
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              min={1}
-                              placeholder="1000"
-                              step={1}
-                              type="number"
-                              {...field}
-                              onChange={(e) =>
-                                field.onChange(
-                                  Number.parseInt(e.target.value, 10) || 1000
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            {t(
-                              "maximumNumberPerDay",
-                              "Maximum number of emails to send per day"
-                            )}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </form>
-          </Form>
-        </ScrollArea>
-        <SheetFooter className="flex flex-row items-center justify-end gap-2 pt-3">
+    <DetailSheet
+      description={t(
+        "broadcastDescription",
+        "Compose the message, select recipients, and review delivery limits before launch."
+      )}
+      footer={
+        <StickyActions
+          description={t(
+            "broadcastSaveHint",
+            "Confirm the recipient estimate and schedule before creating the task."
+          )}
+        >
           <Button onClick={() => setOpen(false)} variant="outline">
             {t("cancel", "Cancel")}
           </Button>
           <Button disabled={loading} form="broadcast-form" type="submit">
-            {loading && (
-              <Icon className="mr-2 h-4 w-4 animate-spin" icon="mdi:loading" />
-            )}
+            {loading && <LoaderCircle className="animate-spin" />}
             {loading
               ? t("processing", "Processing...")
               : !form.watch("scheduled") ||
@@ -663,8 +298,355 @@ export default function EmailBroadcastForm() {
                 ? t("sendNow", "Send Now")
                 : t("scheduleSend", "Schedule Send")}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="lg"
+      title={t("createBroadcast", "Create Broadcast")}
+      trigger={
+        <SettingsEntry
+          description={t(
+            "createNewEmailBroadcastCampaign",
+            "Create new email broadcast campaign"
+          )}
+          icon={SendHorizontal}
+          title={t("emailBroadcast", "Email Broadcast")}
+        />
+      }
+    >
+      <Form {...form}>
+        <form
+          className="space-y-2"
+          id="broadcast-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <Tabs className="space-y-2" defaultValue="content">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="content">
+                {t("content", "Email Content")}
+              </TabsTrigger>
+              <TabsTrigger value="settings">
+                {t("sendSettings", "Send Settings")}
+              </TabsTrigger>
+            </TabsList>
+            {/* Email Content Tab */}
+            <TabsContent className="space-y-2" value="content">
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("subject", "Email Subject")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={`${t("pleaseEnter", "Please enter")} ${t("subject", "Email Subject").toLowerCase()}`}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("content", "Email Content")}</FormLabel>
+                    <FormControl>
+                      <HTMLEditor
+                        onChange={(value) => {
+                          form.setValue(field.name, value || "");
+                        }}
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        "useMarkdownEditor",
+                        "Use Markdown editor to write email content with preview functionality"
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+
+            {/* Send Settings Tab */}
+            <TabsContent className="space-y-2" value="settings">
+              {/* Send scope and estimated recipients */}
+              <div className="grid grid-cols-2 items-center gap-4">
+                <FormField
+                  control={form.control}
+                  name="scope"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("sendScope", "Send Scope")}</FormLabel>
+                      <Select
+                        onValueChange={(value) =>
+                          field.onChange(Number.parseInt(value, 10))
+                        }
+                        value={field.value?.toString() || "1"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t(
+                                "selectSendScope",
+                                "Select send scope"
+                              )}
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">
+                            {t("allUsers", "All Users")}
+                          </SelectItem>{" "}
+                          {/* ScopeAll */}
+                          <SelectItem value="2">
+                            {t("subscribedUsersOnly", "Subscribed users only")}
+                          </SelectItem>{" "}
+                          {/* ScopeActive */}
+                          <SelectItem value="3">
+                            {t(
+                              "expiredSubscriptionUsersOnly",
+                              "Expired subscription users only"
+                            )}
+                          </SelectItem>{" "}
+                          {/* ScopeExpired */}
+                          <SelectItem value="4">
+                            {t(
+                              "noSubscriptionUsersOnly",
+                              "No subscription users only"
+                            )}
+                          </SelectItem>{" "}
+                          {/* ScopeNone */}
+                          <SelectItem value="5">
+                            {t(
+                              "specificUsersOnly",
+                              "Additional emails only (skip platform users)"
+                            )}
+                          </SelectItem>{" "}
+                          {/* ScopeSkip */}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        {t(
+                          "sendScopeDescription",
+                          'Choose the user scope for email sending. Select "Additional emails only" to send only to the email addresses filled below'
+                        )}
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Estimated recipients info */}
+                <div className="flex justify-end">
+                  <div className="border-l-4 border-l-primary bg-primary/10 px-4 py-3 text-sm">
+                    <span className="text-muted-foreground">
+                      {t("estimatedRecipients", "Estimated recipients")}:{" "}
+                    </span>
+                    <span className="font-medium text-lg text-primary">
+                      {estimatedRecipients.total}
+                    </span>
+                    <span className="ml-2 text-muted-foreground text-xs">
+                      ({t("users", "users")}: {estimatedRecipients.users},{" "}
+                      {t("additional", "Additional")}:{" "}
+                      {estimatedRecipients.additional})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="register_start_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("registrationStartDate", "Registration Start Date")}
+                      </FormLabel>
+                      <FormControl>
+                        <EnhancedInput
+                          disabled={form.watch("scope") === 5}
+                          onValueChange={field.onChange}
+                          step="1" // ScopeSkip
+                          type="datetime-local"
+                          value={field.value}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          "includeUsersRegisteredAfter",
+                          "Include users registered on or after this date"
+                        )}
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="register_end_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("registrationEndDate", "Registration End Date")}
+                      </FormLabel>
+                      <FormControl>
+                        <EnhancedInput
+                          disabled={form.watch("scope") === 5}
+                          onValueChange={field.onChange}
+                          step="1" // ScopeSkip
+                          type="datetime-local"
+                          value={field.value}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          "includeUsersRegisteredBefore",
+                          "Include users registered on or before this date"
+                        )}
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Additional recipients */}
+              <FormField
+                control={form.control}
+                name="additional"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t(
+                        "additionalRecipientEmails",
+                        "Additional recipient emails"
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="min-h-[120px] font-mono text-sm"
+                        placeholder={`${t("pleaseEnter", "Please enter")}${t("additionalRecipientEmails", "Additional recipient emails").toLowerCase()}，${t("onePerLine", "one per line")}，for example:\nexample1@domain.com\nexample2@domain.com\nexample3@domain.com`}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        "additionalRecipientsDescription",
+                        "These emails will receive the broadcast in addition to the user filter above"
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Send time settings */}
+              <FormField
+                control={form.control}
+                name="scheduled"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("scheduledSend", "Schedule Send")}</FormLabel>
+                    <FormControl>
+                      <EnhancedInput
+                        onValueChange={field.onChange}
+                        placeholder={t(
+                          "leaveEmptyForImmediateSend",
+                          "Leave empty for immediate send"
+                        )}
+                        step="1"
+                        type="datetime-local"
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        "selectSendTime",
+                        "Select send time, leave empty for immediate send"
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Send rate control */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="interval"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("emailInterval", "Email Interval (seconds)")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          min={1}
+                          placeholder="1"
+                          step={0.1}
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              Number.parseFloat(e.target.value) || 1
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          "intervalTimeBetweenEmails",
+                          "Interval time between each email"
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="limit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("dailySendLimit", "Daily Send Limit")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          min={1}
+                          placeholder="1000"
+                          step={1}
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              Number.parseInt(e.target.value, 10) || 1000
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          "maximumNumberPerDay",
+                          "Maximum number of emails to send per day"
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </form>
+      </Form>
+    </DetailSheet>
   );
 }

@@ -1,4 +1,9 @@
 {
+  "disabledByDefault": "新支付方式默认停用",
+  "formDescription": "配置服务商凭据、回调行为、手续费和面向用户的说明。",
+  "pageDescription": "配置支付服务商、回调地址和客户手续费。",
+  "pageEyebrow": "营收基础设施",
+  "saveHint": "启用前请验证服务商凭据和回调域名。",
   "applyForPayment": "申请支付",
   "batchDelete": "批量删除",
   "cancel": "取消",

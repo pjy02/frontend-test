@@ -13,6 +13,9 @@ states are defined in [`page-patterns.md`](./page-patterns.md).
 Phase 4 production acceptance for dashboard, user operations, and system
 settings is defined in [`vertical-templates.md`](./vertical-templates.md).
 
+Phase 5 routine commerce, content, support, marketing, and payment workflows are
+defined in [`business-pages.md`](./business-pages.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations
