@@ -9,17 +9,11 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/sheet";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
 import { MarkdownEditor } from "@workspace/ui/composed/editor/markdown";
-import { Icon } from "@workspace/ui/composed/icon";
+import { FormSection } from "@workspace/ui/composed/form-section";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -66,8 +60,36 @@ export default function AnnouncementForm<T extends Record<string, any>>({
   }
 
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
-      <SheetTrigger asChild>
+    <DetailSheet
+      description={t(
+        "form.description",
+        "Compose the message and preview how it will appear to customers."
+      )}
+      footer={
+        <StickyActions
+          description={t(
+            "form.saveHint",
+            "Changes take effect after you confirm and save."
+          )}
+        >
+          <Button
+            disabled={loading}
+            onClick={() => setOpen(false)}
+            variant="outline"
+          >
+            {t("form.cancel", "Cancel")}
+          </Button>
+          <Button disabled={loading} onClick={form.handleSubmit(handleSubmit)}>
+            {loading && <LoaderCircle className="animate-spin" />}
+            {t("form.confirm", "Confirm")}
+          </Button>
+        </StickyActions>
+      }
+      onOpenChange={setOpen}
+      open={open}
+      size="lg"
+      title={title}
+      trigger={
         <Button
           onClick={() => {
             form.reset();
@@ -76,18 +98,18 @@ export default function AnnouncementForm<T extends Record<string, any>>({
         >
           {trigger}
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-[800px] max-w-full md:max-w-screen-md">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-48px-36px-36px-env(safe-area-inset-top))] px-6">
-          <Form {...form}>
-            <form
-              className="space-y-4 pt-4"
-              id="notice-form"
-              onSubmit={form.handleSubmit(handleSubmit)}
-            >
+      }
+    >
+      <Form {...form}>
+        <form id="notice-form" onSubmit={form.handleSubmit(handleSubmit)}>
+          <FormSection
+            description={t(
+              "form.contentDescription",
+              "Use a concise title and clear Markdown content."
+            )}
+            title={t("form.contentSection", "Announcement content")}
+          >
+            <div className="grid gap-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -123,27 +145,10 @@ export default function AnnouncementForm<T extends Record<string, any>>({
                   </FormItem>
                 )}
               />
-            </form>
-          </Form>
-        </ScrollArea>
-        <SheetFooter className="flex-row justify-end gap-2 pt-3">
-          <Button
-            disabled={loading}
-            onClick={() => {
-              setOpen(false);
-            }}
-            variant="outline"
-          >
-            {t("form.cancel", "Cancel")}
-          </Button>
-          <Button disabled={loading} onClick={form.handleSubmit(handleSubmit)}>
-            {loading && (
-              <Icon className="mr-2 animate-spin" icon="mdi:loading" />
-            )}{" "}
-            {t("form.confirm", "Confirm")}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+            </div>
+          </FormSection>
+        </form>
+      </Form>
+    </DetailSheet>
   );
 }

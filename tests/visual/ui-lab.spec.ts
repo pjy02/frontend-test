@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("UI Lab renders tokens, components, and preferences", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.addInitScript(() => {
     window.localStorage.setItem("language", "zh-CN");
     document.cookie = "theme=light; path=/";
@@ -45,6 +46,15 @@ test("UI Lab renders tokens, components, and preferences", async ({ page }) => {
     animations: "disabled",
     fullPage: true,
   });
+
+  await page.getByRole("button", { exact: true, name: "新建节点" }).click();
+  const detailSheet = page.getByRole("dialog", { name: "编辑节点" });
+  await expect(detailSheet).toBeVisible();
+  await expect(page).toHaveScreenshot("ui-lab-detail-sheet.png", {
+    animations: "disabled",
+    fullPage: false,
+  });
+  await detailSheet.getByRole("button", { exact: true, name: "取消" }).click();
 
   await page.getByRole("button", { exact: true, name: "深色" }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);

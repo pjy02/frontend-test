@@ -250,6 +250,23 @@ test.describe("admin phase 0 visual baseline", () => {
     ).toBeVisible();
   });
 
+  test("announcement page standards and detail sheet", async ({ page }) => {
+    await preparePage(page, true);
+    await page.goto("/#/dashboard/announcement");
+    await page.waitForLoadState("networkidle");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "公告列表" })
+    ).toBeVisible();
+    await page.getByRole("button", { exact: true, name: "创建" }).click();
+    const detailSheet = page.getByRole("dialog", { name: "创建公告" });
+    await expect(detailSheet).toBeVisible();
+    await stabilizeVisuals(page);
+    await expect(page).toHaveScreenshot("announcement-detail-sheet.png", {
+      animations: "disabled",
+      fullPage: false,
+    });
+  });
+
   test("mobile login and sidebar sheet", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await preparePage(page, false);

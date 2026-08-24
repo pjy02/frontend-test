@@ -53,6 +53,18 @@ import {
 } from "@workspace/ui/components/tabs";
 import { Textarea } from "@workspace/ui/components/textarea";
 import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@workspace/ui/composed/async-state";
+import { DataTable } from "@workspace/ui/composed/data-table";
+import { DetailSheet } from "@workspace/ui/composed/detail-sheet";
+import { FilterBar, FilterSearch } from "@workspace/ui/composed/filter-bar";
+import { FormSection } from "@workspace/ui/composed/form-section";
+import { PageHeader } from "@workspace/ui/composed/page-header";
+import { StatusBadge } from "@workspace/ui/composed/status-badge";
+import { StickyActions } from "@workspace/ui/composed/sticky-actions";
+import {
   DENSITIES,
   type Density,
   useDensity,
@@ -69,6 +81,8 @@ import {
   Moon,
   Palette,
   Play,
+  Plus,
+  Save,
   Search,
   Settings2,
   Sparkles,
@@ -475,6 +489,167 @@ function DataPreview() {
   );
 }
 
+function PageStandardsPreview() {
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-5 rounded-2xl border bg-background p-5 shadow-[var(--shadow-sm)]">
+        <PageHeader
+          actions={
+            <>
+              <Button variant="outline">导出</Button>
+              <DetailSheet
+                description="标准详情面板保持上下文，并在底部固定关键动作。"
+                footer={
+                  <StickyActions description="上次保存于 2 分钟前">
+                    <Button
+                      onClick={() => setDetailOpen(false)}
+                      variant="outline"
+                    >
+                      取消
+                    </Button>
+                    <Button>
+                      <Save />
+                      保存更改
+                    </Button>
+                  </StickyActions>
+                }
+                onOpenChange={setDetailOpen}
+                open={detailOpen}
+                size="md"
+                title="编辑节点"
+                trigger={
+                  <Button>
+                    <Plus />
+                    新建节点
+                  </Button>
+                }
+              >
+                <div className="grid gap-6">
+                  <FormSection
+                    description="用于列表、筛选和监控展示的主要标识。"
+                    title="基本信息"
+                  >
+                    <div className="grid gap-2">
+                      <Label htmlFor="standard-name">节点名称</Label>
+                      <Input
+                        defaultValue="Hong Kong Edge 01"
+                        id="standard-name"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="standard-region">区域</Label>
+                      <Input defaultValue="AP East" id="standard-region" />
+                    </div>
+                  </FormSection>
+                  <FormSection
+                    description="控制节点如何参与自动调度。"
+                    title="运行策略"
+                  >
+                    <div className="flex items-center justify-between rounded-xl border p-3">
+                      <div>
+                        <p className="font-medium text-sm">自动健康检查</p>
+                        <p className="text-muted-foreground text-xs">
+                          每 5 分钟检查一次
+                        </p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </FormSection>
+                </div>
+              </DetailSheet>
+            </>
+          }
+          description="统一页面标题、辅助说明与主要动作的位置和响应式行为。"
+          eyebrow="Infrastructure"
+          metadata={
+            <>
+              <StatusBadge pulse tone="success">
+                系统正常
+              </StatusBadge>
+              <span>共 24 个节点</span>
+            </>
+          }
+          title="节点管理"
+        />
+
+        <FilterBar actions={<Button variant="outline">更多筛选</Button>}>
+          <FilterSearch placeholder="搜索名称、区域或地址…" />
+          <Select defaultValue="all">
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部状态</SelectItem>
+              <SelectItem value="online">在线</SelectItem>
+              <SelectItem value="maintenance">维护中</SelectItem>
+            </SelectContent>
+          </Select>
+        </FilterBar>
+
+        <DataTable
+          columns={4}
+          header={
+            <TableRow>
+              <TableHead>节点</TableHead>
+              <TableHead>区域</TableHead>
+              <TableHead>状态</TableHead>
+              <TableHead className="text-right">延迟</TableHead>
+            </TableRow>
+          }
+        >
+          {[
+            ["Hong Kong Edge 01", "AP East", "在线", "24 ms"],
+            ["Tokyo Core 02", "AP North", "维护中", "—"],
+          ].map((row) => (
+            <TableRow key={row[0]}>
+              <TableCell className="font-medium">{row[0]}</TableCell>
+              <TableCell>{row[1]}</TableCell>
+              <TableCell>
+                <StatusBadge tone={row[2] === "在线" ? "success" : "warning"}>
+                  {row[2]}
+                </StatusBadge>
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row[3]}
+              </TableCell>
+            </TableRow>
+          ))}
+        </DataTable>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <LoadingState compact label="正在加载节点" rows={2} />
+        </div>
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <EmptyState
+            action={<Button size="sm">新建第一项</Button>}
+            compact
+            description="调整筛选条件，或创建第一条记录。"
+            title="暂无数据"
+          />
+        </div>
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <ErrorState
+            compact
+            description={
+              retryCount > 0
+                ? `已重试 ${retryCount} 次，示例状态保持不变。`
+                : "连接服务失败，请稍后重试。"
+            }
+            onRetry={() => setRetryCount((value) => value + 1)}
+            retryLabel="重新加载"
+            title="数据加载失败"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MotionPreview() {
   const [replayKey, setReplayKey] = useState(0);
 
@@ -619,7 +794,7 @@ export default function UiLab() {
                 <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                   <Palette className="size-5" />
                 </div>
-                <Badge variant="secondary">Design System · Phase 1</Badge>
+                <Badge variant="secondary">Design System · Phase 1–3</Badge>
               </div>
               <h1 className="type-display">Perfect Panel UI Lab</h1>
               <p className="mt-4 max-w-2xl text-base text-muted-foreground leading-relaxed">
@@ -678,6 +853,14 @@ export default function UiLab() {
           </LabSection>
 
           <LabSection
+            description="页面标题、筛选、数据、详情与反馈状态遵循同一个组合契约。"
+            eyebrow="Patterns 01"
+            title="页面标准件"
+          >
+            <PageStandardsPreview />
+          </LabSection>
+
+          <LabSection
             description="用短促、可预测的过渡表达因果关系，并自动尊重系统减少动态效果设置。"
             eyebrow="Behavior 01"
             title="Motion Token"
@@ -695,8 +878,8 @@ export default function UiLab() {
         </div>
 
         <footer className="mt-12 flex flex-col gap-2 border-t py-8 text-muted-foreground text-xs sm:flex-row sm:items-center sm:justify-between">
-          <span>Perfect Panel Design System · Phase 1</span>
-          <span>Theme · Type · Density · Motion · Components</span>
+          <span>Perfect Panel Design System · Phase 1–3</span>
+          <span>Foundation · Shell · Page Patterns</span>
         </footer>
       </div>
     </main>

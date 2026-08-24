@@ -7,6 +7,9 @@ design system rather than a copied dashboard skin.
 Phase 2 application-shell architecture, navigation, authentication, and error
 handling are defined in [`application-shell.md`](./application-shell.md).
 
+Phase 3 page composition, data surfaces, detail workflows, and asynchronous
+states are defined in [`page-patterns.md`](./page-patterns.md).
+
 Open the interactive reference at `/#/ui-lab` during local development.
 
 ## Foundations
