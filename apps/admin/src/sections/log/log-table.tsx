@@ -52,6 +52,7 @@ export function LogTable<
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date>();
   const [refreshSeconds, setRefreshSeconds] = useState<number>(() => {
     const saved = window.localStorage.getItem("admin-log-refresh-seconds");
+    if (saved === null) return 30;
     const value = Number(saved);
     return refreshOptions.includes(value as (typeof refreshOptions)[number])
       ? value

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("UI Lab renders tokens, components, and preferences", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-08-24T12:00:00.000Z"));
   test.setTimeout(60_000);
   await page.addInitScript(() => {
     window.localStorage.setItem("language", "zh-CN");

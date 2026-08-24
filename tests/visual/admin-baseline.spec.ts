@@ -265,7 +265,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     balance: 128_600,
     order_no: "PP-20260824-0001",
     type: 321,
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/commission/list": {
     id: 702,
@@ -273,7 +273,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     amount: 2480,
     order_no: "PP-20260824-0001",
     type: 325,
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/email/list": {
     id: 703,
@@ -282,7 +282,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     subject: "Subscription renewed",
     content: { template: "renewal-success", locale: "zh-CN" },
     status: 1,
-    created_at: 1_724_605_200,
+    created_at: 1_724_605_200_000,
   },
   "/v1/admin/log/gift/list": {
     id: 704,
@@ -293,7 +293,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     balance: 133_600,
     type: 341,
     remark: "Retention campaign credit",
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/login/list": {
     id: 705,
@@ -302,7 +302,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     login_ip: "203.0.113.24",
     user_agent: "Mozilla/5.0 PPanel Operations Console",
     success: true,
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/mobile/list": {
     id: 706,
@@ -311,7 +311,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     subject: "Verification code",
     content: { template: "login-code", region: "CN" },
     status: 1,
-    created_at: 1_724_605_200,
+    created_at: 1_724_605_200_000,
   },
   "/v1/admin/log/register/list": {
     id: 707,
@@ -320,7 +320,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     identifier: "member@example.com",
     register_ip: "203.0.113.24",
     user_agent: "Mozilla/5.0 PPanel Operations Console",
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/subscribe/reset/list": {
     id: 708,
@@ -328,7 +328,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     user_subscribe_id: 101,
     type: 231,
     order_no: "PP-20260824-0001",
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/server/traffic/list": {
     id: 709,
@@ -344,7 +344,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     user_subscribe_id: 101,
     client_ip: "203.0.113.24",
     user_agent: "Clash Meta/1.19.0",
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
   "/v1/admin/log/subscribe/traffic/list": {
     id: 711,
@@ -362,7 +362,7 @@ const visualLogRecords: Record<string, Record<string, unknown>> = {
     subscribe_id: 101,
     upload: 3_000_000_000,
     download: 9_000_000_000,
-    timestamp: 1_724_605_200,
+    timestamp: 1_724_605_200_000,
   },
 };
 
@@ -721,6 +721,7 @@ async function mockApi(route: Route) {
 }
 
 async function preparePage(page: Page, authenticated: boolean) {
+  await page.clock.setFixedTime(new Date("2026-08-24T12:00:00.000Z"));
   await page.addInitScript((isAuthenticated) => {
     Math.random = () => 0.5;
     window.localStorage.setItem("language", "zh-CN");
